@@ -1,0 +1,111 @@
+// Fill out your copyright notice in the Description page of Project Settings.
+
+
+#include "Player/WWPlayerController.h"
+#include "EnhancedInputSubsystems.h"
+#include "EnhancedInputComponent.h"
+#include "Character/WWCharacterBase.h"
+
+
+AWWPlayerController::AWWPlayerController()
+{
+	bReplicates = true;
+}
+
+void AWWPlayerController::BeginPlay()
+{
+	Super::BeginPlay();
+
+	UE_LOG(LogTemp, Warning, TEXT("This is a test log!"));
+
+	// Only proceed on local player controller
+	if (IsLocalController())
+	{
+		check(WWContext); // Still keep the check here for safety
+
+		if (ULocalPlayer* LocalPlayer = GetLocalPlayer())
+		{
+			if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(LocalPlayer))
+			{
+				Subsystem->AddMappingContext(WWContext, 0);
+			}
+		}
+
+		bShowMouseCursor = false;
+		SetInputMode(FInputModeGameOnly());
+	}
+	
+}
+
+void AWWPlayerController::SetupInputComponent()
+{
+	Super::SetupInputComponent();
+
+	if (!IsLocalController()) return;
+	UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(InputComponent);
+
+	EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AWWPlayerController::Move);
+	EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AWWPlayerController::Look);
+	EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &AWWPlayerController::JumpPressed);
+	EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &AWWPlayerController::JumpReleased);
+	EnhancedInputComponent->BindAction(CrouchAction, ETriggerEvent::Started, this, &AWWPlayerController::CrouchPressed);
+	EnhancedInputComponent->BindAction(CrouchAction, ETriggerEvent::Completed, this, &AWWPlayerController::CrouchReleased);
+}
+
+void AWWPlayerController::Move(const FInputActionValue& InputActionValue)
+{
+	const FVector2D InputAxisVector = InputActionValue.Get<FVector2D>();
+	const FRotator Rotation = GetControlRotation();
+	const FRotator YawRotation(0.f, Rotation.Yaw, 0.f);
+
+	const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
+	const FVector RightDirection = FRotationMatrix(Rotation).GetUnitAxis(EAxis::Y);
+
+	if (APawn* ControlledPawn = GetPawn<APawn>())
+	{
+		ControlledPawn->AddMovementInput(ForwardDirection, InputAxisVector.Y);
+		ControlledPawn->AddMovementInput(RightDirection, InputAxisVector.X);
+	}
+}
+void AWWPlayerController::Look(const FInputActionValue& InputActionValue)
+{
+	const FVector2D LookAxis = InputActionValue.Get<FVector2D>();
+
+	// Apply yaw (left/right) and pitch (up/down) input
+	AddYawInput(-LookAxis.X);
+	AddPitchInput(LookAxis.Y); // Negative Y to match standard FPS behavior
+}
+
+void AWWPlayerController::JumpPressed(const FInputActionValue& InputActionValue)
+{
+	if (ACharacter* MyCharacter = Cast<AWWCharacterBase>(GetPawn()))
+	{
+		MyCharacter->Jump();
+	}
+}
+
+void AWWPlayerController::JumpReleased(const FInputActionValue& InputActionValue)
+{
+	if (ACharacter* MyCharacter = Cast<AWWCharacterBase>(GetPawn()))
+	{
+		MyCharacter->StopJumping();
+	}
+}
+
+void AWWPlayerController::CrouchPressed(const FInputActionValue& InputActionValue)
+{
+	if (ACharacter* MyCharacter = Cast<AWWCharacterBase>(GetPawn()))
+	{
+		MyCharacter->Crouch();
+		UE_LOG(LogTemp, Warning, TEXT("IsCrouched: %d"), MyCharacter->bIsCrouched);
+	}
+}
+
+void AWWPlayerController::CrouchReleased(const FInputActionValue& InputActionValue)
+{
+	if (ACharacter* MyCharacter = Cast<AWWCharacterBase>(GetPawn()))
+	{
+		MyCharacter->UnCrouch();
+		UE_LOG(LogTemp, Warning, TEXT("IsCrouched: %d"), MyCharacter->bIsCrouched);
+	}
+}
