@@ -6,13 +6,13 @@
 #include "EnhancedInputComponent.h"
 #include "Character/WWCharacterBase.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Interaction/InteractableInterface.h"
 
 
 AWWPlayerController::AWWPlayerController()
 {
 	bReplicates = true;
 }
-
 void AWWPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
@@ -37,6 +37,121 @@ void AWWPlayerController::BeginPlay()
 	}
 	
 }
+void AWWPlayerController::PlayerTick(float DeltaTime)
+{
+	Super::PlayerTick(DeltaTime);
+
+	if (IsLocalController())
+	{
+		CrosshairTrace();
+	}
+
+}
+
+
+
+void AWWPlayerController::CrosshairTrace()
+{
+	
+	AWWCharacterBase* MyCharacter = Cast<AWWCharacterBase>(GetPawn());
+	if (!MyCharacter) return;
+
+	UCameraComponent* FPSCamera = MyCharacter->GetFPSCamera();
+	
+	FVector TraceStart = FPSCamera->GetComponentLocation();
+	FVector ForwardVector = FPSCamera->GetForwardVector();
+	FVector TraceEnd = TraceStart + (ForwardVector * 500.f);
+	
+	FHitResult CrosshairHit;
+	bool bHit = GetWorld()->LineTraceSingleByChannel(CrosshairHit, TraceStart, TraceEnd, ECollisionChannel::ECC_Visibility);
+	if (bHit)
+	{
+		FVector HitLocation = CrosshairHit.ImpactPoint;
+
+		// Log the location
+		UE_LOG(LogTemp, Warning, TEXT("Line Trace Hit Location: X=%f, Y=%f, Z=%f"), 
+			HitLocation.X, HitLocation.Y, HitLocation.Z);
+		if (AActor* HitActor = CrosshairHit.GetActor())
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Hit Actor: %s"), *HitActor->GetName());
+			if (HitActor && HitActor->Implements<UInteractableInterface>())
+			{
+				FString PickupName = IInteractableInterface::Execute_GetPickupName(HitActor);
+				UE_LOG(LogTemp, Warning, TEXT("Interactable Actor Name: %s"), *PickupName);
+			}
+		}
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Line Trace did not hit anything."));
+	}
+
+
+	LastActor = ThisActor;
+	ThisActor = CrosshairHit.GetActor();
+
+	/**
+	 *  Line Trace from crosshair. There are several scenarios:
+	 *  A. LastActor is null && ThisActor is null
+	 *		-Do nothing
+	 *	B. LastActor is null && ThisActor is valid
+	 *		- Highlight ThisActor
+	 *	C. LastActor is valid && ThisActor is null
+	 *		-UnHighlight LastActor
+	 *	D. Both actors are valid, but Last Actor != ThisActor
+	 *		-UnHighlight LastActor, and Highlight ThisActor
+	 *	E. Both actors are valid, and are the same actor
+	 *		-Do nothing
+	 */
+
+	if (LastActor == nullptr)
+	{
+		if (ThisActor != nullptr)
+		{
+			// Case B
+			ThisActor->HighlightActor();
+			
+		}
+		else
+		{
+			// Case A: Do nothing
+		}
+	}
+	else // LastActor is valid
+	{
+		if (ThisActor == nullptr)
+		{
+			// Case C
+			LastActor->UnHighlightActor();
+		}
+		else // Both actors are valid
+		{
+			if (LastActor != ThisActor)
+			{
+				// Case D
+				LastActor->UnHighlightActor();
+				ThisActor->HighlightActor();
+				
+			}
+			else
+			{
+				// Case E: Do nothing
+			}
+		}
+	}
+		
+}
+
+void AWWPlayerController::ShowPickupWidget()
+{
+	
+}
+
+void AWWPlayerController::HidePickupWidget()
+{
+}
+
+
 
 void AWWPlayerController::SetupInputComponent()
 {
@@ -52,6 +167,8 @@ void AWWPlayerController::SetupInputComponent()
 	EnhancedInputComponent->BindAction(CrouchAction, ETriggerEvent::Started, this, &AWWPlayerController::CrouchPressed);
 	EnhancedInputComponent->BindAction(CrouchAction, ETriggerEvent::Completed, this, &AWWPlayerController::CrouchReleased);
 }
+
+
 
 void AWWPlayerController::Move(const FInputActionValue& InputActionValue)
 {
@@ -165,3 +282,5 @@ void AWWPlayerController::UpdateLean(float LeanRoll)
 
 	SetControlRotation(NewRotation);
 }
+
+

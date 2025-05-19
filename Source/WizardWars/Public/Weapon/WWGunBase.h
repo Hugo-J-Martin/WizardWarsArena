@@ -6,6 +6,7 @@
 #include "Components/SphereComponent.h"
 #include "Components/WidgetComponent.h"
 #include "GameFramework/Actor.h"
+#include "Interaction/InteractableInterface.h"
 #include "WWGunBase.generated.h"
 
 UENUM(BlueprintType)
@@ -19,7 +20,7 @@ enum class EWeaponState : uint8
 };
 
 UCLASS()
-class WIZARDWARS_API AWWGunBase : public AActor
+class WIZARDWARS_API AWWGunBase : public AActor, public IInteractableInterface
 {
 	GENERATED_BODY()
 	
@@ -28,6 +29,17 @@ public:
 	AWWGunBase();
 	virtual void Tick(float DeltaTime) override;
 	void ShowPickupWidget(bool bShowWidget);
+
+	virtual void HighlightActor() override;
+	virtual void UnHighlightActor() override;
+
+	virtual FString GetPickupName_Implementation() const override;
+
+	UPROPERTY(BlueprintReadOnly)
+	FString PickupName;
+
+	UPROPERTY(BlueprintReadOnly)
+	bool bHighlighted = false;
 
 protected:
 	// Called when the game starts or when spawned
@@ -49,19 +61,27 @@ protected:
 		UPrimitiveComponent* OtherComp,
 		int32 OtherBodyIndex
 	);
-
-private:	
+	
 	
 	UPROPERTY(EditAnywhere, Category = "Weapon Properties")
 	TObjectPtr<USkeletalMeshComponent> GunMesh;
 
-	UPROPERTY(EditAnywhere, Category = "Weapon Properties")
+	UPROPERTY(EditAnywhere, Category = "Weapon Properties|Pickup")
 	TObjectPtr<USphereComponent> PickupRadius;
+
+	UPROPERTY(EditAnywhere, Category = "Weapon Properties|Pickup")
+	TObjectPtr<USphereComponent> HighlightRadius;
 
 	UPROPERTY(VisibleAnywhere, Category = "Weapon Properties")
 	EWeaponState WeaponState;
 
-	UPROPERTY(EditAnywhere, Category = "Weapon Properties")
+	UPROPERTY(EditAnywhere, Category = "Weapon Properties|Pickup")
 	TObjectPtr<UWidgetComponent> PickupWidget;
+
+	UPROPERTY(EditAnywhere, Category = "Weapon Properties")
+	FString WeaponName;
+private:	
+	
+
 	
 };

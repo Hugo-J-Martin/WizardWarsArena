@@ -27,16 +27,27 @@ AWWGunBase::AWWGunBase()
 	GunMesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Ignore);
 	GunMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	
-
+	//Pickup Radius Initialize
 	PickupRadius = CreateDefaultSubobject<USphereComponent>("PickupRadius");
 	PickupRadius->SetupAttachment(RootComponent);
 	PickupRadius->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
 	PickupRadius->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
-	//Radius Default values
-	PickupRadius->SetSphereRadius(100.f);
+	//Pickup Radius Default values
+	PickupRadius->SetSphereRadius(300.f);
 	PickupRadius->SetVisibility(true);
 	PickupRadius->SetHiddenInGame(false);
+
+	//Highlight Radius Initialize
+	HighlightRadius = CreateDefaultSubobject<USphereComponent>("HighlightRadius");
+	HighlightRadius->SetupAttachment(RootComponent);
+	HighlightRadius->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
+	HighlightRadius->SetCollisionResponseToChannel(ECollisionChannel::ECC_Visibility, ECollisionResponse::ECR_Block);
+
+	//Pickup Radius Default values
+	HighlightRadius->SetSphereRadius(100.f);
+	HighlightRadius->SetVisibility(true);
+	HighlightRadius->SetHiddenInGame(false);
 
 	//Pickup Widget
 	PickupWidget = CreateDefaultSubobject<UWidgetComponent>("PickupWidget");
@@ -85,7 +96,6 @@ void AWWGunBase::OnSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AA
 	}
 }
 
-
 void AWWGunBase::ShowPickupWidget(bool bShowWidget)
 {
 	if (PickupWidget)
@@ -93,4 +103,23 @@ void AWWGunBase::ShowPickupWidget(bool bShowWidget)
 		PickupWidget->SetVisibility(bShowWidget);
 	}
 }
+
+void AWWGunBase::HighlightActor()
+{
+	bHighlighted = true;
+}
+
+void AWWGunBase::UnHighlightActor()
+{
+	bHighlighted = false;
+}
+
+FString AWWGunBase::GetPickupName_Implementation() const
+{
+	return WeaponName;
+}
+
+
+
+
 

@@ -42,7 +42,6 @@ protected:
 	UPROPERTY()
 	TObjectPtr<UAttributeSet> AttributeSet;
 
-	
 
 private:
 
@@ -52,9 +51,12 @@ private:
 	UPROPERTY(ReplicatedUsing = OnRep_OverlappingWeapon)
 	class AWWGunBase* OverlappingWeapon;
 
+	
+
 	UFUNCTION()
 	void OnRep_OverlappingWeapon(AWWGunBase* LastWeapon);
 public:
+	
 	void SetOverlappingWeapon(AWWGunBase* Weapon);
-
+	UCameraComponent* GetFPSCamera() const {return FPSCamera;}
 };

@@ -107,5 +107,3 @@ void AWWCharacterBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 }
-
-

@@ -3,6 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Camera/CameraComponent.h"
+#include "Character/WWCharacter.h"
 #include "GameFramework/PlayerController.h"
 #include "WWPlayerController.generated.h"
 
@@ -10,7 +12,7 @@
 class UInputMappingContext;
 class UInputAction;
 struct FInputActionValue;
-
+class IInteractableInterface;
 /**
  * 
  */
@@ -21,10 +23,14 @@ class WIZARDWARS_API AWWPlayerController : public APlayerController
 
 public:
 	AWWPlayerController();
+	virtual void PlayerTick(float DeltaTime) override;
+
+
 	
 protected:
 	virtual void BeginPlay() override;
 	virtual void SetupInputComponent() override;
+
 
 private:
 	UPROPERTY(EditAnywhere, Category = "Input")
@@ -42,9 +48,10 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Input")
 	TObjectPtr<UInputAction> CrouchAction;
 
+	// Movement Config
 	UPROPERTY(EditAnywhere, Category = "Movement")
 	float LeanSpeed = 5.f;
-
+	// Input Handlers
 	void Move(const FInputActionValue& InputActionValue);
 	void Look(const FInputActionValue& InputActionValue);
 	void JumpPressed(const FInputActionValue& InputActionValue);
@@ -52,11 +59,23 @@ private:
 	void CrouchPressed(const FInputActionValue& InputActionValue);
 	void CrouchReleased(const FInputActionValue& InputActionValue);
 
-	
+	// Advanced Movement 
 	void MovementLean(float ScaleVal);
 	void UpdateLean(float LeanRoll);
 
+	// Checking Under Crosshair for Weapon
+	void CrosshairTrace();
+	TScriptInterface<IInteractableInterface> LastActor;
+	TScriptInterface<IInteractableInterface> ThisActor;
+
+	//Pickup Widget
+	UPROPERTY()
+	TObjectPtr<UUserWidget> PickupWidget;
+
 	UPROPERTY(EditAnywhere, Category = "UI|Weapon")
-	TObjectPtr<UWidgetComponent> PickupWidget;
+	TSubclassOf<UUserWidget> PickupWidgetClass;
+
+	void ShowPickupWidget();
+	void HidePickupWidget();
 	
 };
