@@ -42,10 +42,21 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Input")
 	TObjectPtr<UInputAction> CrouchAction;
 
+	UPROPERTY(EditAnywhere, Category = "Movement")
+	float LeanSpeed = 5.f;
+
 	void Move(const FInputActionValue& InputActionValue);
 	void Look(const FInputActionValue& InputActionValue);
 	void JumpPressed(const FInputActionValue& InputActionValue);
 	void JumpReleased(const FInputActionValue& InputActionValue);
 	void CrouchPressed(const FInputActionValue& InputActionValue);
 	void CrouchReleased(const FInputActionValue& InputActionValue);
+
+	
+	void MovementLean(float ScaleVal);
+	void UpdateLean(float LeanRoll);
+
+	UPROPERTY(EditAnywhere, Category = "UI|Weapon")
+	TObjectPtr<UWidgetComponent> PickupWidget;
+	
 };

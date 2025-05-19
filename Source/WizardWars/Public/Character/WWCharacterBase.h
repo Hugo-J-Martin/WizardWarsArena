@@ -3,18 +3,26 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "AbilitySystemInterface.h"
 #include "GameFramework/Character.h"
 #include "WWCharacterBase.generated.h"
 
+
+class UAbilitySystemComponent;
+class UAttributeSet;
+
 UCLASS(Abstract)
-class WIZARDWARS_API AWWCharacterBase : public ACharacter
+class WIZARDWARS_API AWWCharacterBase : public ACharacter, public IAbilitySystemInterface
 {
 	GENERATED_BODY()
 
 public:
 	// Sets default values for this character's properties
 	AWWCharacterBase();
-
+	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
+	UAttributeSet* GetAttributeSet() const { return AttributeSet; }
+	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
+	virtual void Tick(float DeltaTime) override;
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -28,20 +36,25 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Combat")
 	TObjectPtr<USkeletalMeshComponent> FPSWeapon;
 
-	//void MoveForward(float Value);
-	//void MoveRight(float Value);
-	//void LookUp(float Value);
-	//void Turn(float Value);
+	UPROPERTY()
+	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;
+
+	UPROPERTY()
+	TObjectPtr<UAttributeSet> AttributeSet;
+
+	
 
 private:
 
 	UPROPERTY(VisibleAnywhere, Category = Camera)
 	class UCameraComponent* FPSCamera;
+	
+	UPROPERTY(ReplicatedUsing = OnRep_OverlappingWeapon)
+	class AWWGunBase* OverlappingWeapon;
 
+	UFUNCTION()
+	void OnRep_OverlappingWeapon(AWWGunBase* LastWeapon);
 public:
-	//called to bind functionality to input
-	//virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-	
-	
+	void SetOverlappingWeapon(AWWGunBase* Weapon);
 
 };

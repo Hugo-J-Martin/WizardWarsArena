@@ -5,6 +5,7 @@
 #include "EnhancedInputSubsystems.h"
 #include "EnhancedInputComponent.h"
 #include "Character/WWCharacterBase.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 
 AWWPlayerController::AWWPlayerController()
@@ -66,6 +67,7 @@ void AWWPlayerController::Move(const FInputActionValue& InputActionValue)
 		ControlledPawn->AddMovementInput(ForwardDirection, InputAxisVector.Y);
 		ControlledPawn->AddMovementInput(RightDirection, InputAxisVector.X);
 	}
+	MovementLean(InputAxisVector.X);
 }
 void AWWPlayerController::Look(const FInputActionValue& InputActionValue)
 {
@@ -108,4 +110,58 @@ void AWWPlayerController::CrouchReleased(const FInputActionValue& InputActionVal
 		MyCharacter->UnCrouch();
 		UE_LOG(LogTemp, Warning, TEXT("IsCrouched: %d"), MyCharacter->bIsCrouched);
 	}
+}
+
+void AWWPlayerController::MovementLean(float ScaleVal)
+{
+	if (ACharacter* MyCharacter = Cast<AWWCharacterBase>(GetPawn()))
+	{
+		// Check 1: Is the character moving?
+		FVector Velocity = MyCharacter->GetVelocity();
+		bool bIsMoving = Velocity.Size() > 0.f;
+		
+		bool bIsOnGround = false;
+		if (MyCharacter && MyCharacter->GetCharacterMovement())
+		{
+			bIsOnGround = !MyCharacter->GetCharacterMovement()->IsFalling();
+		}
+
+		// Check 3: Is ScaleVal not 0
+		bool bHasInput = !FMath::IsNearlyZero(ScaleVal);
+
+		// Combine all conditions
+		if (bIsMoving && bIsOnGround && bHasInput)
+		{
+			// ✅ All conditions met — apply leaning logic here
+			UE_LOG(LogTemp, Log, TEXT("Leaning triggered: %f"), ScaleVal);
+			if (ScaleVal > 0.f)
+			{
+				UpdateLean(2.5);
+			}
+			else if (ScaleVal < 0.f)
+			{
+				UpdateLean(357.5);
+			}
+		}
+		else
+		{
+			
+			UpdateLean(0);
+		}
+	}
+}
+
+void AWWPlayerController::UpdateLean(float LeanRoll)
+{
+	float DeltaTime = GetWorld()->GetDeltaSeconds();
+
+	FRotator CurrentRotation = GetControlRotation();
+
+	FRotator TargetRotation = CurrentRotation;
+	TargetRotation.Roll = LeanRoll;
+
+	float InterpSpeed = LeanSpeed;
+	FRotator NewRotation = FMath::RInterpTo(CurrentRotation, TargetRotation, DeltaTime, InterpSpeed);
+
+	SetControlRotation(NewRotation);
 }

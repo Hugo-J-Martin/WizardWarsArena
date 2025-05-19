@@ -13,5 +13,11 @@ UCLASS()
 class WIZARDWARS_API AWWCharacter : public AWWCharacterBase
 {
 	GENERATED_BODY()
-	
+public:
+	AWWCharacter();
+
+	virtual void PossessedBy(AController* NewController) override;
+	virtual void OnRep_PlayerState() override;
+private:
+	void InitAbilityActorInfo();
 };
