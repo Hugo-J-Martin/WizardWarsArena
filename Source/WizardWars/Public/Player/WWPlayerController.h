@@ -13,6 +13,7 @@ class UInputMappingContext;
 class UInputAction;
 struct FInputActionValue;
 class IInteractableInterface;
+class UWWPickupWidgetBase;
 /**
  * 
  */
@@ -25,6 +26,8 @@ public:
 	AWWPlayerController();
 	virtual void PlayerTick(float DeltaTime) override;
 
+	void ShowPickupWidget();
+	void HidePickupWidget();
 
 	
 protected:
@@ -68,14 +71,13 @@ private:
 	TScriptInterface<IInteractableInterface> LastActor;
 	TScriptInterface<IInteractableInterface> ThisActor;
 
-	//Pickup Widget
-	UPROPERTY()
-	TObjectPtr<UUserWidget> PickupWidget;
+
 
 	UPROPERTY(EditAnywhere, Category = "UI|Weapon")
-	TSubclassOf<UUserWidget> PickupWidgetClass;
+	TSubclassOf<UWWPickupWidgetBase> PickupWidgetClass;
 
-	void ShowPickupWidget();
-	void HidePickupWidget();
+	UWWPickupWidgetBase* PickupWidgetInstance;
+
+
 	
 };

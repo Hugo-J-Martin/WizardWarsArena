@@ -31,7 +31,7 @@ protected:
 	TObjectPtr<USkeletalMeshComponent> FPSMesh;
 
 	UPROPERTY(EditAnywhere, Category = "Combat")
-	TObjectPtr<USkeletalMeshComponent> TPSWeapon;
+	TObjectPtr<USkeletalMeshComponent> PlayerWeapon;
 
 	UPROPERTY(EditAnywhere, Category = "Combat")
 	TObjectPtr<USkeletalMeshComponent> FPSWeapon;

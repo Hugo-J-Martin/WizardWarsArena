@@ -8,6 +8,7 @@
 #include "Components/WidgetComponent.h"
 
 #include "Net/UnrealNetwork.h"
+#include "Player/WWPlayerController.h"
 
 // Sets default values
 AWWGunBase::AWWGunBase()
@@ -95,28 +96,32 @@ void AWWGunBase::OnSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AA
 		WWCharacter->SetOverlappingWeapon(nullptr);
 	}
 }
+void AWWGunBase::HighlightActor(AWWPlayerController* PC)
+{
+	bHighlighted = true;
+	GunMesh->SetRenderCustomDepth(true);
+	AWWPlayerController* WWPC = Cast<AWWPlayerController>(PC);
+	WWPC->ShowPickupWidget();
+}
 
+void AWWGunBase::UnHighlightActor(AWWPlayerController* PC)
+{
+	bHighlighted = false;
+	GunMesh->SetRenderCustomDepth(false);
+	AWWPlayerController* WWPC = Cast<AWWPlayerController>(PC);
+	WWPC->HidePickupWidget();
+}
+
+FString AWWGunBase::GetPickupName_Implementation() const
+{
+	return WeaponName;
+}
 void AWWGunBase::ShowPickupWidget(bool bShowWidget)
 {
 	if (PickupWidget)
 	{
 		PickupWidget->SetVisibility(bShowWidget);
 	}
-}
-
-void AWWGunBase::HighlightActor()
-{
-	bHighlighted = true;
-}
-
-void AWWGunBase::UnHighlightActor()
-{
-	bHighlighted = false;
-}
-
-FString AWWGunBase::GetPickupName_Implementation() const
-{
-	return WeaponName;
 }
 
 

@@ -18,7 +18,7 @@ AWWCharacterBase::AWWCharacterBase()
 	GetCharacterMovement()->GetNavAgentPropertiesRef().bCanCrouch = true;
 
 	GetCharacterMovement()->GravityScale = 2.2f;
-	GetCharacterMovement()->MaxWalkSpeed = 5000.f;
+	GetCharacterMovement()->MaxAcceleration = 5000.f;
 	GetCharacterMovement()->GroundFriction = 4.f;
 	GetCharacterMovement()->MaxWalkSpeed = 1000.f;
 	GetCharacterMovement()->BrakingDecelerationWalking = 100.f;
@@ -45,9 +45,9 @@ AWWCharacterBase::AWWCharacterBase()
 	FPSWeapon->bOnlyOwnerSee = true;
 **/
 	
-	TPSWeapon = CreateDefaultSubobject<USkeletalMeshComponent>("TPSWeapon");
-	TPSWeapon->SetupAttachment(GetMesh(), FName("TPSWeaponHandSocket"));
-	TPSWeapon->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	PlayerWeapon = CreateDefaultSubobject<USkeletalMeshComponent>("PlayerWeapon");
+	PlayerWeapon->SetupAttachment(GetMesh(), FName("WeaponHandSocket"));
+	PlayerWeapon->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	//TPSWeapon->bOwnerNoSee = true;
 }
 

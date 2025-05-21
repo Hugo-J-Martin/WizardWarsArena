@@ -4,9 +4,11 @@
 #include "Player/WWPlayerController.h"
 #include "EnhancedInputSubsystems.h"
 #include "EnhancedInputComponent.h"
+#include "Blueprint/UserWidget.h"
 #include "Character/WWCharacterBase.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Interaction/InteractableInterface.h"
+#include "Widget/WWPickupWidgetBase.h"
 
 
 AWWPlayerController::AWWPlayerController()
@@ -34,6 +36,12 @@ void AWWPlayerController::BeginPlay()
 
 		bShowMouseCursor = false;
 		SetInputMode(FInputModeGameOnly());
+	}
+
+	if (PickupWidgetClass)
+	{
+		PickupWidgetInstance = CreateWidget<UWWPickupWidgetBase>(this, PickupWidgetClass);
+		UE_LOG(LogTemp, Warning, TEXT("CreatedWidget!"));
 	}
 	
 }
@@ -66,24 +74,13 @@ void AWWPlayerController::CrosshairTrace()
 	bool bHit = GetWorld()->LineTraceSingleByChannel(CrosshairHit, TraceStart, TraceEnd, ECollisionChannel::ECC_Visibility);
 	if (bHit)
 	{
-		FVector HitLocation = CrosshairHit.ImpactPoint;
-
-		// Log the location
-		UE_LOG(LogTemp, Warning, TEXT("Line Trace Hit Location: X=%f, Y=%f, Z=%f"), 
-			HitLocation.X, HitLocation.Y, HitLocation.Z);
 		if (AActor* HitActor = CrosshairHit.GetActor())
 		{
-			UE_LOG(LogTemp, Warning, TEXT("Hit Actor: %s"), *HitActor->GetName());
 			if (HitActor && HitActor->Implements<UInteractableInterface>())
 			{
-				FString PickupName = IInteractableInterface::Execute_GetPickupName(HitActor);
-				UE_LOG(LogTemp, Warning, TEXT("Interactable Actor Name: %s"), *PickupName);
+				FString PickupName = IInteractableInterface::Execute_GetPickupName(HitActor);;
 			}
 		}
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Line Trace did not hit anything."));
 	}
 
 
@@ -109,7 +106,7 @@ void AWWPlayerController::CrosshairTrace()
 		if (ThisActor != nullptr)
 		{
 			// Case B
-			ThisActor->HighlightActor();
+			ThisActor->HighlightActor(this);
 			
 		}
 		else
@@ -122,15 +119,15 @@ void AWWPlayerController::CrosshairTrace()
 		if (ThisActor == nullptr)
 		{
 			// Case C
-			LastActor->UnHighlightActor();
+			LastActor->UnHighlightActor(this);
 		}
 		else // Both actors are valid
 		{
 			if (LastActor != ThisActor)
 			{
 				// Case D
-				LastActor->UnHighlightActor();
-				ThisActor->HighlightActor();
+				LastActor->UnHighlightActor(this);
+				ThisActor->HighlightActor(this);
 				
 			}
 			else
@@ -144,11 +141,23 @@ void AWWPlayerController::CrosshairTrace()
 
 void AWWPlayerController::ShowPickupWidget()
 {
-	
+	UWWPickupWidgetBase* PickupWidgetActual = CreateWidget<UWWPickupWidgetBase>(this, UWWPickupWidgetBase::StaticClass());
+	PickupWidgetActual->AddToViewport();
+	if (PickupWidgetInstance)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("ActivatePickup!"));
+		PickupWidgetInstance->AddToViewport();
+	}
 }
 
 void AWWPlayerController::HidePickupWidget()
 {
+	
+	if (PickupWidgetInstance)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("DeactivatePickup!"));
+		PickupWidgetInstance->RemoveFromViewport();
+	}
 }
 
 

@@ -30,8 +30,8 @@ public:
 	virtual void Tick(float DeltaTime) override;
 	void ShowPickupWidget(bool bShowWidget);
 
-	virtual void HighlightActor() override;
-	virtual void UnHighlightActor() override;
+	virtual void HighlightActor(AWWPlayerController* PC) override;
+	virtual void UnHighlightActor(AWWPlayerController* PC) override;
 
 	virtual FString GetPickupName_Implementation() const override;
 
