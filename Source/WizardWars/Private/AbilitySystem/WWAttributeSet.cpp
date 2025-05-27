@@ -7,8 +7,9 @@
 
 UWWAttributeSet::UWWAttributeSet()
 {
-	InitHealth(100.f);
+	InitHealth(50.f);
 	InitMaxHealth(100.f);
+	InitHealthRegenRate(5.f);
 	InitArmor(0.f);
 	InitMaxArmor(100.f);
 	InitMoveSpeed(1000.f);
@@ -20,6 +21,7 @@ void UWWAttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutL
 
 	DOREPLIFETIME_CONDITION_NOTIFY(UWWAttributeSet, Health, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(UWWAttributeSet, MaxHealth, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UWWAttributeSet, HealthRegenRate, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(UWWAttributeSet, Armor, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(UWWAttributeSet, MaxArmor, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(UWWAttributeSet, MoveSpeed, COND_None, REPNOTIFY_Always);
@@ -33,6 +35,11 @@ void UWWAttributeSet::OnRep_Health(const FGameplayAttributeData& OldHealth) cons
 void UWWAttributeSet::OnRep_MaxHealth(const FGameplayAttributeData& OldMaxHealth) const
 {
 	GAMEPLAYATTRIBUTE_REPNOTIFY(UWWAttributeSet, MaxHealth, OldMaxHealth);
+}
+
+void UWWAttributeSet::OnRep_HealthRegenRate(const FGameplayAttributeData& OldHealthRegenRate) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UWWAttributeSet, HealthRegenRate, OldHealthRegenRate);
 }
 
 void UWWAttributeSet::OnRep_Armor(const FGameplayAttributeData& OldArmor) const

@@ -32,6 +32,10 @@ public:
 	FGameplayAttributeData MaxHealth;
 	ATTRIBUTE_ACCESSORS(UWWAttributeSet, MaxHealth);
 	
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_HealthRegenRate, Category = "Stats")
+    FGameplayAttributeData HealthRegenRate;
+    ATTRIBUTE_ACCESSORS(UWWAttributeSet, HealthRegenRate);
+	
 	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_Health, Category = "Stats")
 	FGameplayAttributeData Armor;
 	ATTRIBUTE_ACCESSORS(UWWAttributeSet, Armor);
@@ -48,6 +52,8 @@ public:
 	void OnRep_Health(const FGameplayAttributeData& OldHealth) const;
 	UFUNCTION()
 	void OnRep_MaxHealth(const FGameplayAttributeData& OldMaxHealth) const;
+	UFUNCTION()
+	void OnRep_HealthRegenRate(const FGameplayAttributeData& OldHealthRegenRate) const;
 	UFUNCTION()
 	void OnRep_Armor(const FGameplayAttributeData& OldArmor) const;
 	UFUNCTION()

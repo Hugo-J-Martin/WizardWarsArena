@@ -30,7 +30,11 @@ void AWWPlayerController::BeginPlay()
 		{
 			if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(LocalPlayer))
 			{
-				Subsystem->AddMappingContext(WWContext, 0);
+				if (Subsystem)
+				{
+					Subsystem->AddMappingContext(WWContext, 0);
+				}
+				
 			}
 		}
 
@@ -242,24 +246,25 @@ void AWWPlayerController::MovementLean(float ScaleVal)
 {
 	if (ACharacter* MyCharacter = Cast<AWWCharacterBase>(GetPawn()))
 	{
-		// Check 1: Is the character moving?
+		// Is the character moving?
 		FVector Velocity = MyCharacter->GetVelocity();
 		bool bIsMoving = Velocity.Size() > 0.f;
-		
+
+		//Is the character on the ground?
 		bool bIsOnGround = false;
 		if (MyCharacter && MyCharacter->GetCharacterMovement())
 		{
 			bIsOnGround = !MyCharacter->GetCharacterMovement()->IsFalling();
 		}
 
-		// Check 3: Is ScaleVal not 0
+		// Is input scale not 0
 		bool bHasInput = !FMath::IsNearlyZero(ScaleVal);
 
-		// Combine all conditions
+		// Check all conditions
 		if (bIsMoving && bIsOnGround && bHasInput)
 		{
-			// ✅ All conditions met — apply leaning logic here
-			UE_LOG(LogTemp, Log, TEXT("Leaning triggered: %f"), ScaleVal);
+			// All conditions met
+			//UE_LOG(LogTemp, Log, TEXT("Leaning triggered: %f"), ScaleVal);
 			if (ScaleVal > 0.f)
 			{
 				UpdateLean(2.5);

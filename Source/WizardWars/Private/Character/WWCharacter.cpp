@@ -2,7 +2,9 @@
 
 #include "Character/WWCharacter.h"
 #include "AbilitySystemComponent.h"
+#include "Player/WWPlayerController.h"
 #include "Player/WWPlayerState.h"
+#include "UI/HUD/WWHUD.h"
 
 
 AWWCharacter::AWWCharacter()
@@ -33,4 +35,13 @@ void AWWCharacter::InitAbilityActorInfo()
 	WWPlayerState->GetAbilitySystemComponent()->InitAbilityActorInfo(WWPlayerState, this);
 	AbilitySystemComponent = WWPlayerState->GetAbilitySystemComponent();
 	AttributeSet = WWPlayerState->GetAttributeSet();
+
+	if (AWWPlayerController* WWPlayerController = Cast<AWWPlayerController>(GetController()))
+	{
+		if (AWWHUD* WWHUD = Cast <AWWHUD>(WWPlayerController->GetHUD()))
+		{
+			WWHUD->InitOverlay(WWPlayerController, WWPlayerState, AbilitySystemComponent, AttributeSet);
+		}
+	}
+	
 }
