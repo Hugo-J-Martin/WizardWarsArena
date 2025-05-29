@@ -6,6 +6,7 @@
 #include "Camera/CameraComponent.h"
 #include "Character/WWCharacter.h"
 #include "GameFramework/PlayerController.h"
+#include "Widget/InteractionTextComponent.h"
 #include "WWPlayerController.generated.h"
 
 
@@ -26,9 +27,14 @@ public:
 	AWWPlayerController();
 	virtual void PlayerTick(float DeltaTime) override;
 
-	void ShowPickupWidget();
+	UFUNCTION(Client, Reliable)
+	void ShowInteractionText(const FText& Item, AWWGunBase* Weapon);
+
+	void ShowPickupWidget(const FText& Name);
 	void HidePickupWidget();
 
+
+	//void GetInteractionHovered();
 	
 protected:
 	virtual void BeginPlay() override;
@@ -70,13 +76,19 @@ private:
 	void CrosshairTrace();
 	TScriptInterface<IInteractableInterface> LastActor;
 	TScriptInterface<IInteractableInterface> ThisActor;
+	//GetInteractionHovered(const TScriptInterface<IInteractableInterface>& HoveredActor);
+	
+
+	UPROPERTY(EditDefaultsOnly, Category = "UI")
+	TSubclassOf<UWWPickupWidgetBase> InteractionWidget;
+
+	UWWPickupWidgetBase* CurrentInteractionWidget = nullptr;
 
 
+	UPROPERTY(EditDefaultsOnly, Category = "UI|Interaction")
+	TSubclassOf<UInteractionTextComponent> InteractionTextComponentClass;
 
-	UPROPERTY(EditAnywhere, Category = "UI|Weapon")
-	TSubclassOf<UWWPickupWidgetBase> PickupWidgetClass;
-
-	UWWPickupWidgetBase* PickupWidgetInstance;
+	
 
 
 	

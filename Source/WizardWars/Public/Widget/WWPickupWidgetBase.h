@@ -23,4 +23,7 @@ protected:
 	// Variable set from c++, bind in BP
 	UPROPERTY(BlueprintReadWrite, meta = (BindWidget), Category = "Pickup")
 	class UTextBlock* PickupNameText;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Pickup")
+	FText PickupName;
 };

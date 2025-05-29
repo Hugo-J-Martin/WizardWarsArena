@@ -35,9 +35,9 @@ AWWGunBase::AWWGunBase()
 	PickupRadius->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
 	//Pickup Radius Default values
-	PickupRadius->SetSphereRadius(300.f);
+	PickupRadius->SetSphereRadius(1000.f);
 	PickupRadius->SetVisibility(true);
-	PickupRadius->SetHiddenInGame(false);
+	//PickupRadius->SetHiddenInGame(false);
 
 	//Highlight Radius Initialize
 	HighlightRadius = CreateDefaultSubobject<USphereComponent>("HighlightRadius");
@@ -48,11 +48,8 @@ AWWGunBase::AWWGunBase()
 	//Pickup Radius Default values
 	HighlightRadius->SetSphereRadius(100.f);
 	HighlightRadius->SetVisibility(true);
-	HighlightRadius->SetHiddenInGame(false);
-
-	//Pickup Widget
-	PickupWidget = CreateDefaultSubobject<UWidgetComponent>("PickupWidget");
-	PickupWidget->SetupAttachment(RootComponent);
+	//HighlightRadius->SetHiddenInGame(false);
+	
 }
 
 // Called when the game starts or when spawned
@@ -100,16 +97,12 @@ void AWWGunBase::HighlightActor(AWWPlayerController* PC)
 {
 	bHighlighted = true;
 	GunMesh->SetRenderCustomDepth(true);
-	AWWPlayerController* WWPC = Cast<AWWPlayerController>(PC);
-	WWPC->ShowPickupWidget();
 }
 
 void AWWGunBase::UnHighlightActor(AWWPlayerController* PC)
 {
 	bHighlighted = false;
 	GunMesh->SetRenderCustomDepth(false);
-	AWWPlayerController* WWPC = Cast<AWWPlayerController>(PC);
-	WWPC->HidePickupWidget();
 }
 
 FString AWWGunBase::GetPickupName_Implementation() const

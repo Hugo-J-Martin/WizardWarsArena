@@ -4,15 +4,19 @@
 #include "UI/WidgetController/HUDWidgetController.h"
 
 #include "AbilitySystem/WWAttributeSet.h"
+#include "Player/WWPlayerController.h"
 
 void UHUDWidgetController::BroadcastInitialValues()
 {
 	const UWWAttributeSet* WWAttributeSet = CastChecked<UWWAttributeSet>(AttributeSet);
+	AWWPlayerController* WWPC = CastChecked<AWWPlayerController>(PlayerController);
 
 	OnHealthChanged.Broadcast(WWAttributeSet->GetHealth());
 	OnMaxHealthChanged.Broadcast(WWAttributeSet->GetMaxHealth());
 	OnArmorChanged.Broadcast(WWAttributeSet->GetArmor());
 	OnMaxArmorChanged.Broadcast(WWAttributeSet->GetMaxArmor());
+	
+	
 
 	
 }
@@ -32,6 +36,10 @@ void UHUDWidgetController::BindCallbacksToDependencies()
 
 	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(
 		WWAttributeSet->GetMaxArmorAttribute()).AddUObject(this, &UHUDWidgetController::MaxArmorChanged);
+
+	const AWWPlayerController* WWPC = CastChecked<AWWPlayerController>(PlayerController);
+
+	
 }
 
 void UHUDWidgetController::HealthChanged(const FOnAttributeChangeData& Data) const
@@ -53,3 +61,6 @@ void UHUDWidgetController::MaxArmorChanged(const FOnAttributeChangeData& Data) c
 {
 	OnMaxArmorChanged.Broadcast(Data.NewValue);
 }
+
+
+

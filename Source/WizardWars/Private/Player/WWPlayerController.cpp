@@ -9,6 +9,8 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Interaction/InteractableInterface.h"
 #include "Widget/WWPickupWidgetBase.h"
+#include "Weapon/WWGunBase.h"
+#include "Widget/InteractionTextComponent.h"
 
 
 AWWPlayerController::AWWPlayerController()
@@ -21,38 +23,43 @@ void AWWPlayerController::BeginPlay()
 
 	UE_LOG(LogTemp, Warning, TEXT("This is a test log!"));
 
-	// Only proceed on local player controller
-	if (IsLocalController())
+	// Adds the input system for the player
+	if (IsLocalController())// Checks if the controller is owned by local player
 	{
 		check(WWContext); // Still keep the check here for safety
 
+		
 		if (ULocalPlayer* LocalPlayer = GetLocalPlayer())
 		{
+			// Using unreals EnhancedInputSystem, need the subsystem
 			if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(LocalPlayer))
 			{
-				if (Subsystem)
+				if (Subsystem) //if the subsystem is valid
 				{
+					//Adds WWContext as the players subsystem
 					Subsystem->AddMappingContext(WWContext, 0);
 				}
 				
 			}
 		}
 
-		bShowMouseCursor = false;
-		SetInputMode(FInputModeGameOnly());
+		
+		bShowMouseCursor = false; //Dont show mouse cursor
+		SetInputMode(FInputModeGameOnly()); //Input mode to game only, no menu
 	}
 
-	if (PickupWidgetClass)
-	{
-		PickupWidgetInstance = CreateWidget<UWWPickupWidgetBase>(this, PickupWidgetClass);
-		UE_LOG(LogTemp, Warning, TEXT("CreatedWidget!"));
-	}
+	//if (PickupWidgetClass)
+	//{
+	//	PickupWidgetInstance = CreateWidget<UWWPickupWidgetBase>(this, PickupWidgetClass);
+	//	UE_LOG(LogTemp, Warning, TEXT("CreatedWidget!"));
+	//}
 	
 }
 void AWWPlayerController::PlayerTick(float DeltaTime)
 {
 	Super::PlayerTick(DeltaTime);
 
+	//If locally owned player controller, do CrosshairTrace every tick
 	if (IsLocalController())
 	{
 		CrosshairTrace();
@@ -60,35 +67,52 @@ void AWWPlayerController::PlayerTick(float DeltaTime)
 
 }
 
+void AWWPlayerController::ShowInteractionText_Implementation(const FText& Item, AWWGunBase* Weapon)
+{
+	//Checks to see if the Weapon is valid and the InteractionTextComponentClass
+	if (IsValid(Weapon) && InteractionTextComponentClass)
+	{
+		//Creates new InteractionText
+		UInteractionTextComponent* InteractionText =  NewObject<UInteractionTextComponent>(this, InteractionTextComponentClass);
+		InteractionText->RegisterComponent(); //Registers the InteractionText to player
+		InteractionText->SetInteractionText(Item); //Set the InteractionText to the functions input
+		
+		
+	}
+}
 
 
 void AWWPlayerController::CrosshairTrace()
 {
-	
+	//Checks to see if its the CharacterBase
 	AWWCharacterBase* MyCharacter = Cast<AWWCharacterBase>(GetPawn());
 	if (!MyCharacter) return;
 
+	//Variable of pointer to cameracomponent, getting the characters FPS Camera
 	UCameraComponent* FPSCamera = MyCharacter->GetFPSCamera();
-	
+
+	//Initializing the LineTrace input variables
 	FVector TraceStart = FPSCamera->GetComponentLocation();
 	FVector ForwardVector = FPSCamera->GetForwardVector();
 	FVector TraceEnd = TraceStart + (ForwardVector * 500.f);
-	
 	FHitResult CrosshairHit;
+	
+	//Creating a boolen variable for if the LineTrace hits smth
 	bool bHit = GetWorld()->LineTraceSingleByChannel(CrosshairHit, TraceStart, TraceEnd, ECollisionChannel::ECC_Visibility);
 	if (bHit)
 	{
-		if (AActor* HitActor = CrosshairHit.GetActor())
+		//DrawDebugSphere(GetWorld(), CrosshairHit.Location, 10.0f, 12, FColor::Yellow, false, 1.0f);
+		if (AActor* HitActor = CrosshairHit.GetActor()) //Checks to see if it's an actor 
 		{
-			if (HitActor && HitActor->Implements<UInteractableInterface>())
+			if (HitActor && HitActor->Implements<UInteractableInterface>()) //Checks if actor implements the interaction interface
 			{
-				FString PickupName = IInteractableInterface::Execute_GetPickupName(HitActor);;
+				FString PickupName = IInteractableInterface::Execute_GetPickupName(HitActor);; //If it does, get the pickup's name
 			}
 		}
 	}
 
-
-	LastActor = ThisActor;
+	//Setting up actor variables for applying outline 
+	LastActor = ThisActor; 
 	ThisActor = CrosshairHit.GetActor();
 
 	/**
@@ -111,6 +135,9 @@ void AWWPlayerController::CrosshairTrace()
 		{
 			// Case B
 			ThisActor->HighlightActor(this);
+			UObject* ActorObject = ThisActor.GetObject();
+			FString PickupName = ThisActor->Execute_GetPickupName(ActorObject);
+			ShowPickupWidget(FText::FromString(PickupName));
 			
 		}
 		else
@@ -124,6 +151,9 @@ void AWWPlayerController::CrosshairTrace()
 		{
 			// Case C
 			LastActor->UnHighlightActor(this);
+			HidePickupWidget();
+			
+			
 		}
 		else // Both actors are valid
 		{
@@ -131,7 +161,12 @@ void AWWPlayerController::CrosshairTrace()
 			{
 				// Case D
 				LastActor->UnHighlightActor(this);
+				HidePickupWidget();
 				ThisActor->HighlightActor(this);
+				UObject* ActorObject = ThisActor.GetObject();
+				FString PickupName = ThisActor->Execute_GetPickupName(ActorObject);
+				ShowPickupWidget(FText::FromString(PickupName));
+				//GetInteractionHovered();
 				
 			}
 			else
@@ -143,26 +178,33 @@ void AWWPlayerController::CrosshairTrace()
 		
 }
 
-void AWWPlayerController::ShowPickupWidget()
+
+
+
+void AWWPlayerController::ShowPickupWidget(const FText& Name)
 {
-	UWWPickupWidgetBase* PickupWidgetActual = CreateWidget<UWWPickupWidgetBase>(this, UWWPickupWidgetBase::StaticClass());
-	PickupWidgetActual->AddToViewport();
-	if (PickupWidgetInstance)
+	UWWPickupWidgetBase* PickupWidget = CreateWidget<UWWPickupWidgetBase>(this, UWWPickupWidgetBase::StaticClass());
+	PickupWidget->AddToViewport();
+
+	CurrentInteractionWidget = CreateWidget<UWWPickupWidgetBase>(GetWorld(), InteractionWidget);
+	if (CurrentInteractionWidget)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("ActivatePickup!"));
-		PickupWidgetInstance->AddToViewport();
+		CurrentInteractionWidget->SetPickupName(Name);
+		CurrentInteractionWidget->AddToViewport();
 	}
 }
 
 void AWWPlayerController::HidePickupWidget()
 {
-	
-	if (PickupWidgetInstance)
+
+	if (CurrentInteractionWidget)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("DeactivatePickup!"));
-		PickupWidgetInstance->RemoveFromViewport();
+		CurrentInteractionWidget->RemoveFromParent();
+		CurrentInteractionWidget = nullptr;
 	}
+
 }
+
 
 
 

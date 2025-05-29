@@ -7,8 +7,9 @@
 
 void UWWPickupWidgetBase::SetPickupName(const FText& NewName)
 {
+	PickupName = NewName;
 	if (PickupNameText)
 	{
-		PickupNameText->SetText(NewName);
+		PickupNameText->SetText(PickupName);
 	}
 }

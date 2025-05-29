@@ -10,8 +10,8 @@ UWWAttributeSet::UWWAttributeSet()
 	InitHealth(50.f);
 	InitMaxHealth(100.f);
 	InitHealthRegenRate(5.f);
-	InitArmor(0.f);
-	InitMaxArmor(100.f);
+	InitArmor(50.f);
+	InitMaxArmor(50.f);
 	InitMoveSpeed(1000.f);
 }
 
