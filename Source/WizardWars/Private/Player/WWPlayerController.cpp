@@ -98,7 +98,7 @@ void AWWPlayerController::CrosshairTrace()
 	FHitResult CrosshairHit;
 	
 	//Creating a boolen variable for if the LineTrace hits smth
-	bool bHit = GetWorld()->LineTraceSingleByChannel(CrosshairHit, TraceStart, TraceEnd, ECollisionChannel::ECC_Visibility);
+	bool bHit = GetWorld()->LineTraceSingleByChannel(CrosshairHit, TraceStart, TraceEnd, ECollisionChannel::ECC_GameTraceChannel1);
 	if (bHit)
 	{
 		//DrawDebugSphere(GetWorld(), CrosshairHit.Location, 10.0f, 12, FColor::Yellow, false, 1.0f);

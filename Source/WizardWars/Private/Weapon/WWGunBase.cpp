@@ -43,7 +43,7 @@ AWWGunBase::AWWGunBase()
 	HighlightRadius = CreateDefaultSubobject<USphereComponent>("HighlightRadius");
 	HighlightRadius->SetupAttachment(RootComponent);
 	HighlightRadius->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
-	HighlightRadius->SetCollisionResponseToChannel(ECollisionChannel::ECC_Visibility, ECollisionResponse::ECR_Block);
+	HighlightRadius->SetCollisionResponseToChannel(ECollisionChannel::ECC_GameTraceChannel1, ECollisionResponse::ECR_Block);
 
 	//Pickup Radius Default values
 	HighlightRadius->SetSphereRadius(100.f);

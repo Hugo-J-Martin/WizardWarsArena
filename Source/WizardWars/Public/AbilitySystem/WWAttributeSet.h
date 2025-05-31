@@ -24,6 +24,8 @@ public:
 	UWWAttributeSet();
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
+	virtual void PreAttributeBaseChange(const FGameplayAttribute& Attribute, float& NewValue) const override;
+
 	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_Health, Category = "Stats")
 	FGameplayAttributeData Health;
 	ATTRIBUTE_ACCESSORS(UWWAttributeSet, Health);

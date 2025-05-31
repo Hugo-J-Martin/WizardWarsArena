@@ -4,8 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "GameplayEffectTypes.h"
 #include "WWPickupEffectActor.generated.h"
 
+class UAbilitySystemComponent;
 class UGameplayEffect;
 
 UENUM(BlueprintType)
@@ -19,9 +21,35 @@ enum class EEffectApplicationPolicy : uint8
 UENUM(BlueprintType)
 enum class EEffectRemovalPolicy : uint8
 {
+	RemoveOnOverlap,
 	RemoveOnEndOverlap,
 	DoNotRemove
 };
+
+
+USTRUCT(BlueprintType)
+struct FUGameplayEffects
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TSubclassOf<UGameplayEffect> GameplayEffectClass;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	EEffectApplicationPolicy ApplicationPolicy;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	EEffectRemovalPolicy RemovalPolicy;
+
+	FActiveGameplayEffectHandle ActiveGameplayEffectHandle;
+
+	FUGameplayEffects()
+	{
+		ApplicationPolicy = EEffectApplicationPolicy::DoNotApply;
+		RemovalPolicy = EEffectRemovalPolicy::DoNotRemove;
+	}
+};
+
 UCLASS()
 class WIZARDWARS_API AWWPickupEffectActor : public AActor
 {
@@ -36,9 +64,9 @@ protected:
 
 	virtual void BeginPlay() override;
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable) //const FGameplayEffectData& GameplayEffectData FUNCTION HEADER
 	void ApplyEffectToTarget(AActor* TargetActor, TSubclassOf<UGameplayEffect> GameplayEffectClass);
-
+	
 	UFUNCTION(BlueprintCallable)
 	void OnOverlap(AActor* TargetActor);
 
@@ -47,6 +75,14 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Applied Effects")
 	bool bDestroyOnEffectRemoval = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Applied Effects")
+	TArray<FUGameplayEffects> GameplayEffects;
+	
+	/**
+	TMap<FActiveGameplayEffectHandle, UAbilitySystemComponent*> ActiveEffectHandles;
+
+	
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Applied Effects")
 	TSubclassOf<UGameplayEffect> InstantGameplayEffectClass;
@@ -68,7 +104,9 @@ protected:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Applied Effects")
 	EEffectRemovalPolicy InfiniteEffectRemovalPolicy = EEffectRemovalPolicy::RemoveOnEndOverlap;
-
+**/
+	
+	
 private:
 	
 

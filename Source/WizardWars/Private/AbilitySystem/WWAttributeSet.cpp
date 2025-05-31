@@ -27,6 +27,30 @@ void UWWAttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutL
 	DOREPLIFETIME_CONDITION_NOTIFY(UWWAttributeSet, MoveSpeed, COND_None, REPNOTIFY_Always);
 }
 
+void UWWAttributeSet::PreAttributeBaseChange(const FGameplayAttribute& Attribute, float& NewValue) const
+{
+	Super::PreAttributeBaseChange(Attribute, NewValue);
+
+	if (Attribute == GetHealthAttribute())
+	{
+		NewValue = FMath::Clamp(NewValue, 0.f, GetMaxHealth());
+		UE_LOG(LogTemp, Warning, TEXT("Health: %f"), NewValue);
+	}
+	if (Attribute == GetMaxHealthAttribute())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("MaxHealth: %f"), NewValue);
+	}
+	if (Attribute == GetArmorAttribute())
+	{
+		NewValue = FMath::Clamp(NewValue, 0.f, GetMaxArmor());
+		UE_LOG(LogTemp, Warning, TEXT("Armor: %f"), NewValue);
+	}
+	if (Attribute == GetMaxArmorAttribute())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("MaxArmor: %f"), NewValue);
+	}
+}
+
 void UWWAttributeSet::OnRep_Health(const FGameplayAttributeData& OldHealth) const
 {
 	GAMEPLAYATTRIBUTE_REPNOTIFY(UWWAttributeSet, Health, OldHealth);
