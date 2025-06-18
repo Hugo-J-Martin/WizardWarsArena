@@ -21,7 +21,7 @@ void AWWPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
 
-	UE_LOG(LogTemp, Warning, TEXT("This is a test log!"));
+	//UE_LOG(LogTemp, Warning, TEXT("This is a test log!"));
 
 	// Adds the input system for the player
 	if (IsLocalController())// Checks if the controller is owned by local player
@@ -47,12 +47,7 @@ void AWWPlayerController::BeginPlay()
 		bShowMouseCursor = false; //Dont show mouse cursor
 		SetInputMode(FInputModeGameOnly()); //Input mode to game only, no menu
 	}
-
-	//if (PickupWidgetClass)
-	//{
-	//	PickupWidgetInstance = CreateWidget<UWWPickupWidgetBase>(this, PickupWidgetClass);
-	//	UE_LOG(LogTemp, Warning, TEXT("CreatedWidget!"));
-	//}
+	
 	
 }
 void AWWPlayerController::PlayerTick(float DeltaTime)
@@ -84,7 +79,7 @@ void AWWPlayerController::ShowInteractionText_Implementation(const FText& Item, 
 
 void AWWPlayerController::CrosshairTrace()
 {
-	//Checks to see if its the CharacterBase
+	//Checks to see if it's the CharacterBase
 	AWWCharacterBase* MyCharacter = Cast<AWWCharacterBase>(GetPawn());
 	if (!MyCharacter) return;
 
@@ -221,6 +216,7 @@ void AWWPlayerController::SetupInputComponent()
 	EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &AWWPlayerController::JumpReleased);
 	EnhancedInputComponent->BindAction(CrouchAction, ETriggerEvent::Started, this, &AWWPlayerController::CrouchPressed);
 	EnhancedInputComponent->BindAction(CrouchAction, ETriggerEvent::Completed, this, &AWWPlayerController::CrouchReleased);
+	EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Started, this, &AWWPlayerController::Interact);
 }
 
 
@@ -252,7 +248,7 @@ void AWWPlayerController::Look(const FInputActionValue& InputActionValue)
 
 void AWWPlayerController::JumpPressed(const FInputActionValue& InputActionValue)
 {
-	if (ACharacter* MyCharacter = Cast<AWWCharacterBase>(GetPawn()))
+	if (AWWCharacterBase* MyCharacter = Cast<AWWCharacterBase>(GetPawn()))
 	{
 		MyCharacter->Jump();
 	}
@@ -260,7 +256,7 @@ void AWWPlayerController::JumpPressed(const FInputActionValue& InputActionValue)
 
 void AWWPlayerController::JumpReleased(const FInputActionValue& InputActionValue)
 {
-	if (ACharacter* MyCharacter = Cast<AWWCharacterBase>(GetPawn()))
+	if (AWWCharacterBase* MyCharacter = Cast<AWWCharacterBase>(GetPawn()))
 	{
 		MyCharacter->StopJumping();
 	}
@@ -268,7 +264,7 @@ void AWWPlayerController::JumpReleased(const FInputActionValue& InputActionValue
 
 void AWWPlayerController::CrouchPressed(const FInputActionValue& InputActionValue)
 {
-	if (ACharacter* MyCharacter = Cast<AWWCharacterBase>(GetPawn()))
+	if (AWWCharacterBase* MyCharacter = Cast<AWWCharacterBase>(GetPawn()))
 	{
 		MyCharacter->Crouch();
 		UE_LOG(LogTemp, Warning, TEXT("IsCrouched: %d"), MyCharacter->bIsCrouched);
@@ -277,16 +273,26 @@ void AWWPlayerController::CrouchPressed(const FInputActionValue& InputActionValu
 
 void AWWPlayerController::CrouchReleased(const FInputActionValue& InputActionValue)
 {
-	if (ACharacter* MyCharacter = Cast<AWWCharacterBase>(GetPawn()))
+	if (AWWCharacterBase* MyCharacter = Cast<AWWCharacterBase>(GetPawn()))
 	{
 		MyCharacter->UnCrouch();
 		UE_LOG(LogTemp, Warning, TEXT("IsCrouched: %d"), MyCharacter->bIsCrouched);
 	}
 }
 
+void AWWPlayerController::Interact(const FInputActionValue& InputActionValue)
+{
+	//UE_LOG(LogTemp, Warning, TEXT("EquipWasPressed"));
+	if (AWWCharacterBase* MyCharacter = Cast<AWWCharacterBase>(GetPawn()))
+	{
+		MyCharacter->Equip();
+	}
+}
+
+
 void AWWPlayerController::MovementLean(float ScaleVal)
 {
-	if (ACharacter* MyCharacter = Cast<AWWCharacterBase>(GetPawn()))
+	if (AWWCharacterBase* MyCharacter = Cast<AWWCharacterBase>(GetPawn()))
 	{
 		// Is the character moving?
 		FVector Velocity = MyCharacter->GetVelocity();

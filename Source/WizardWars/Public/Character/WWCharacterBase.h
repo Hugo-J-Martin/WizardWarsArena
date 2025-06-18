@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "AbilitySystemInterface.h"
 #include "GameFramework/Character.h"
+#include "Weapon/WWGunBase.h"
 #include "WWCharacterBase.generated.h"
 
 
@@ -22,25 +23,41 @@ public:
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 	UAttributeSet* GetAttributeSet() const { return AttributeSet; }
 	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
+	virtual void PostInitializeComponents() override;
 	virtual void Tick(float DeltaTime) override;
+
+	virtual void PossessedBy(AController* NewController) override;
+	virtual void OnRep_PlayerState() override;
+	
+	void Equip();
+
+	FORCEINLINE AWWGunBase* GetEquippedWeapon() const { return EquippedWeapon; }
+
+	void SetEquippedWeapon(AWWGunBase* NewWeapon);
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+	
 
 	UPROPERTY(EditAnywhere, Category = "Character")
 	TObjectPtr<USkeletalMeshComponent> FPSMesh;
 
-	UPROPERTY(EditAnywhere, Category = "Combat")
-	TObjectPtr<USkeletalMeshComponent> PlayerWeapon;
+	//UPROPERTY(EditAnywhere, Category = "Combat")
+	//TObjectPtr<USkeletalMeshComponent> PlayerWeapon;
 
-	UPROPERTY(EditAnywhere, Category = "Combat")
-	TObjectPtr<USkeletalMeshComponent> FPSWeapon;
+	//UPROPERTY(EditAnywhere, Category = "Combat")
+	//TObjectPtr<USkeletalMeshComponent> FPSWeapon;
 
 	UPROPERTY()
 	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;
 
 	UPROPERTY()
 	TObjectPtr<UAttributeSet> AttributeSet;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Weapon")
+	AWWGunBase* EquippedWeapon;
+
+
 
 
 private:
@@ -51,10 +68,17 @@ private:
 	UPROPERTY(ReplicatedUsing = OnRep_OverlappingWeapon)
 	class AWWGunBase* OverlappingWeapon;
 
-	
-
 	UFUNCTION()
 	void OnRep_OverlappingWeapon(AWWGunBase* LastWeapon);
+
+	UPROPERTY(VisibleAnywhere)
+	class UWWCombatComponent* Combat;
+
+	void InitAbilityActorInfo();
+
+	UFUNCTION(Server, Reliable)
+	void ServerEquipButtonPressed();
+	
 public:
 	
 	void SetOverlappingWeapon(AWWGunBase* Weapon);

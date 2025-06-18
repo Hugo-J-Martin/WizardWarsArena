@@ -3,24 +3,29 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "AbilitySystemInterface.h"
+#include "AttributeSet.h"
+#include "GameplayEffect.h"
 #include "Components/SphereComponent.h"
 #include "Components/WidgetComponent.h"
 #include "GameFramework/Actor.h"
 #include "Interaction/InteractableInterface.h"
 #include "WWGunBase.generated.h"
 
+class UGameplayEffect;
+class UAbilitySystemComponent;
+class UAttributeSet;
 UENUM(BlueprintType)
 enum class EWeaponState : uint8
 {
 	EWS_Initial UMETA(DisplayName = "Inital State"),
 	EWS_Equipped UMETA(DisplayName = "Equipped"),
 	EWS_Dropped UMETA(DisplayName = "Dropped"),
-
 	EWS_MAX UMETA(DisplayName = "DefaultMAX")
 };
 
 UCLASS()
-class WIZARDWARS_API AWWGunBase : public AActor, public IInteractableInterface
+class WIZARDWARS_API AWWGunBase : public AActor, public IInteractableInterface, public IAbilitySystemInterface
 {
 	GENERATED_BODY()
 	
@@ -35,15 +40,40 @@ public:
 
 	virtual FString GetPickupName_Implementation() const override;
 
+	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
+	UAttributeSet* GetAttributeSet() const { return AttributeSet; }
+	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
+	
+
+	virtual void InitializeEffect();
+	virtual void ApplyEffect(TSubclassOf<UGameplayEffect> GameplayEffect);
+	virtual void RemoveEffect(TSubclassOf<UGameplayEffect> GameplayEffect);
+
+	virtual void OnPickup();
+	
 	UPROPERTY(BlueprintReadOnly)
 	FString PickupName;
 
 	UPROPERTY(BlueprintReadOnly)
 	bool bHighlighted = false;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TSubclassOf<UGameplayEffect> CurrentGameplayEffect;
+
+	UPROPERTY(EditAnywhere, Category = "Tags")
+	TSubclassOf<UGameplayEffect> GE_Equipped;
+
+	UPROPERTY(EditAnywhere, Category = "Tags")
+	TSubclassOf<UGameplayEffect> GE_Dropped;
+
+	UPROPERTY(EditAnywhere, Category = "Tags")
+	TSubclassOf<UGameplayEffect> GE_ReadyToPickup;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+
+
 
 	UFUNCTION()
 	virtual void OnSphereOverlap(
@@ -61,7 +91,15 @@ protected:
 		UPrimitiveComponent* OtherComp,
 		int32 OtherBodyIndex
 	);
+
+	UPROPERTY()
+	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;
+
+	UPROPERTY()
+	TObjectPtr<UAttributeSet> AttributeSet;
 	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "GAS")
+	TObjectPtr<UAbilitySystemComponent> AbilitySystem;
 	
 	UPROPERTY(EditAnywhere, Category = "Weapon Properties")
 	TObjectPtr<USkeletalMeshComponent> GunMesh;
@@ -80,8 +118,10 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "Weapon Properties")
 	FString WeaponName;
+
+
 private:	
 	
-
+	void InitAbilityActorInfo();
 	
 };

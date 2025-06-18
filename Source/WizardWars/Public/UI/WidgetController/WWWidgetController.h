@@ -17,8 +17,8 @@ struct FWidgetControllerParams
 	GENERATED_BODY()
 
 	FWidgetControllerParams() {}
-	FWidgetControllerParams(APlayerController* PC, APlayerState* PS, UAbilitySystemComponent* ASC, UAttributeSet* AS)
-	: PlayerController(PC), PlayerState(PS), AbilitySystemComponent(ASC), AttributeSet(AS) {}
+	FWidgetControllerParams(APlayerController* PC, APlayerState* PS, UAbilitySystemComponent* ASC, UAttributeSet* AS, UAttributeSet* WeaponAS)
+	: PlayerController(PC), PlayerState(PS), AbilitySystemComponent(ASC), AttributeSet(AS), WeaponAttributeSet(WeaponAS) {}
 	//ADD 
 	//ADD WeaponAbilitySystemComponent(WeaponASC), WeaponAttributeSet(WeaponAS)
 
@@ -34,12 +34,12 @@ struct FWidgetControllerParams
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TObjectPtr<UAttributeSet> AttributeSet = nullptr;
 
-	//FOR WHEN I ADD WEAPON
-	//UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	//TObjectPtr<UAbilitySystemComponent> WeaponAbilitySystemComponent = nullptr;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TObjectPtr<UAttributeSet> WeaponAttributeSet = nullptr;
 
-	//UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	//TObjectPtr<UAttributeSet> WeaponAttributeSet = nullptr;
+	//FOR WHEN I ADD WEAPON
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TObjectPtr<UAbilitySystemComponent> WeaponAbilitySystemComponent = nullptr;
 };
 /**
  * 
@@ -54,7 +54,13 @@ public:
 
 	virtual void BroadcastInitialValues();
 
+	//virtual void BroadcastWeaponValues();
+
 	virtual void BindCallbacksToDependencies();
+
+	//virtual void BindWeaponCallbacksToDependecies();
+
+	//virtual void SetWeaponAttributes(UAttributeSet* InWeaponAttributes);
 protected:
 
 	UPROPERTY(BlueprintReadOnly, Category = "WidgetController")
@@ -69,9 +75,11 @@ protected:
 	UPROPERTY(BlueprintReadOnly, Category = "WidgetController")
 	TObjectPtr<UAttributeSet> AttributeSet;
 
-	//UPROPERTY(BlueprintReadOnly, Category = "WidgetController")
-	//TObjectPtr<UAbilitySystemComponent> WeaponAbilitySystemComponent;
+	/**
+	UPROPERTY(BlueprintReadOnly, Category = "WidgetController")
+	TObjectPtr<UAbilitySystemComponent> WeaponAbilitySystemComponent;
 
-	//UPROPERTY(BlueprintReadOnly, Category = "WidgetController")
-	//TObjectPtr<UAttributeSet> WeaponAttributeSet;
+	UPROPERTY(BlueprintReadOnly, Category = "WidgetController")
+	TObjectPtr<UAttributeSet> WeaponAttributeSet;
+	**/
 };

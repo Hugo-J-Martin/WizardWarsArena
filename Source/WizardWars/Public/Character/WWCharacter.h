@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Character/WWCharacterBase.h"
+#include "UI/WidgetController/WWWidgetController.h"
 #include "WWCharacter.generated.h"
 
 /**
@@ -14,10 +15,15 @@ class WIZARDWARS_API AWWCharacter : public AWWCharacterBase
 {
 	GENERATED_BODY()
 public:
-	AWWCharacter();
+	//AWWCharacter();
 
-	virtual void PossessedBy(AController* NewController) override;
-	virtual void OnRep_PlayerState() override;
+	//virtual void PossessedBy(AController* NewController) override;
+	//virtual void OnRep_PlayerState() override;
+
 private:
-	void InitAbilityActorInfo();
+	
+	//void InitAbilityActorInfo();
+
+
+	
 };

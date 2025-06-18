@@ -26,7 +26,7 @@ void AWWHUD::InitOverlay(APlayerController* PC, APlayerState* PS, UAbilitySystem
 	UUserWidget* Widget = CreateWidget<UUserWidget>(GetWorld(), HUDWidgetClass);
 	HUDWidget = Cast<UWWUserWidget>(Widget);
 
-	const FWidgetControllerParams WidgetControllerParams(PC, PS, ASC, AS);
+	const FWidgetControllerParams WidgetControllerParams(PC, PS, ASC, AS, nullptr); 
 	UHUDWidgetController* WidgetController = GetHUDWidgetController(WidgetControllerParams);
 	
 	HUDWidget->SetWidgetController(WidgetController);
@@ -34,4 +34,9 @@ void AWWHUD::InitOverlay(APlayerController* PC, APlayerState* PS, UAbilitySystem
 	
 	Widget->AddToViewport();
 }
+
+//void AWWHUD::OnWeaponEquipped(AWWGunBase* NewWeapon)
+//{
+	
+//}
 

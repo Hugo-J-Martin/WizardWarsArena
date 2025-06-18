@@ -5,8 +5,9 @@
 #include "Player/WWPlayerController.h"
 #include "Player/WWPlayerState.h"
 #include "UI/HUD/WWHUD.h"
+#include "UI/WidgetController/HUDWidgetController.h"
 
-
+/**
 AWWCharacter::AWWCharacter()
 {
 	
@@ -28,6 +29,8 @@ void AWWCharacter::OnRep_PlayerState()
 	InitAbilityActorInfo();
 }
 
+
+
 void AWWCharacter::InitAbilityActorInfo()
 {
 	AWWPlayerState* WWPlayerState = GetPlayerState<AWWPlayerState>();
@@ -45,3 +48,5 @@ void AWWCharacter::InitAbilityActorInfo()
 	}
 	
 }
+**/
+

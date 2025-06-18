@@ -27,6 +27,8 @@ public:
 
 	void InitOverlay(APlayerController* PC, APlayerState* PS, UAbilitySystemComponent* ASC, UAttributeSet* AS);
 
+	//void OnWeaponEquipped(AWWGunBase* NewWeapon);
+
 protected:
 	
 private:

@@ -33,7 +33,8 @@ public:
 	void ShowPickupWidget(const FText& Name);
 	void HidePickupWidget();
 
-
+	TScriptInterface<IInteractableInterface> LastActor;
+	TScriptInterface<IInteractableInterface> ThisActor;
 	//void GetInteractionHovered();
 	
 protected:
@@ -56,6 +57,9 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "Input")
 	TObjectPtr<UInputAction> CrouchAction;
+	
+	UPROPERTY(EditAnywhere, Category = "Input")
+	TObjectPtr<UInputAction> InteractAction;
 
 	// Movement Config
 	UPROPERTY(EditAnywhere, Category = "Movement")
@@ -67,6 +71,7 @@ private:
 	void JumpReleased(const FInputActionValue& InputActionValue);
 	void CrouchPressed(const FInputActionValue& InputActionValue);
 	void CrouchReleased(const FInputActionValue& InputActionValue);
+	void Interact(const FInputActionValue& InputActionValue);
 
 	// Advanced Movement 
 	void MovementLean(float ScaleVal);
@@ -74,9 +79,8 @@ private:
 
 	// Checking Under Crosshair for Weapon
 	void CrosshairTrace();
-	TScriptInterface<IInteractableInterface> LastActor;
-	TScriptInterface<IInteractableInterface> ThisActor;
-	//GetInteractionHovered(const TScriptInterface<IInteractableInterface>& HoveredActor);
+
+	
 	
 
 	UPROPERTY(EditDefaultsOnly, Category = "UI")
