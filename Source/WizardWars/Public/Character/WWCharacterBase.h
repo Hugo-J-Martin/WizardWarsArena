@@ -31,9 +31,7 @@ public:
 	
 	void Equip();
 
-	FORCEINLINE AWWGunBase* GetEquippedWeapon() const { return EquippedWeapon; }
 
-	void SetEquippedWeapon(AWWGunBase* NewWeapon);
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -54,8 +52,6 @@ protected:
 	UPROPERTY()
 	TObjectPtr<UAttributeSet> AttributeSet;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Weapon")
-	AWWGunBase* EquippedWeapon;
 
 
 

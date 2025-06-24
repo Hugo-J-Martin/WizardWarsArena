@@ -4,10 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "UI/WidgetController/HUDWidgetController.h"
 #include "WWCombatComponent.generated.h"
 
 class AWWGunBase;
 class UAbilitySystemComponent;
+
+
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class WIZARDWARS_API UWWCombatComponent : public UActorComponent
@@ -21,11 +24,20 @@ public:
 	friend class AWWCharacterBase;
 
 	void EquipWeapon(AWWGunBase* WeaponToEquip);
+
+	void SetWidgetController(UHUDWidgetController* InWidgetController)
+	{
+		WidgetController = InWidgetController;
+		UE_LOG(LogTemp, Warning, TEXT("CombatComponent: WidgetController Set"));
+	}
 	
 protected:
 	virtual void BeginPlay() override;
 
+	UFUNCTION()
+	void OnRep_CurrentWeapon();
 
+	void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
 private:
 	
 	
@@ -40,13 +52,26 @@ private:
 	
 
 	AWWCharacterBase* Character;
-	UPROPERTY()
+	
+	UPROPERTY(ReplicatedUsing = OnRep_CurrentWeapon)
 	AWWGunBase* CurrentWeapon;
 
 	UPROPERTY()
 	UAbilitySystemComponent* AbilityComponent;
 
+	UPROPERTY()
+	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;
+
+	UPROPERTY()
+	TObjectPtr<UWWGunAttributeSet> WeaponAttributeSet;
+
 	void InitializeASC();
+
+	UPROPERTY()
+	UHUDWidgetController* WidgetController;
+
+
+	//FOnWeaponEquipped OnWeaponEquipped;
 
 
 	

@@ -7,6 +7,9 @@
 #include "Character/WWCharacter.h"
 #include "Character/WWCharacterBase.h"
 #include "Engine/SkeletalMeshSocket.h"
+#include "Net/UnrealNetwork.h"
+#include "Player/WWPlayerController.h"
+#include "UI/HUD/WWHUD.h"
 
 // Sets default values for this component's properties
 UWWCombatComponent::UWWCombatComponent()
@@ -26,6 +29,40 @@ void UWWCombatComponent::BeginPlay()
 	InitializeASC();
 	Character = Cast<AWWCharacterBase>(GetOwner());
 	
+}
+
+void UWWCombatComponent::OnRep_CurrentWeapon()
+{
+	if (!Character || !Character->IsLocallyControlled() || !CurrentWeapon) return;
+
+	// Ensure the ASC is valid
+	UAbilitySystemComponent* WeaponASC = CurrentWeapon->GetAbilitySystemComponent();
+	UAttributeSet* WeaponAttributes = CurrentWeapon->GetAttributeSet();
+
+	if (!WeaponASC || !WeaponAttributes)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("ASC or AttributeSet is null in OnRep_CurrentWeapon."));
+		return;
+	}
+
+	// Optional: Init ability actor info if needed
+	WeaponASC->InitAbilityActorInfo(CurrentWeapon, CurrentWeapon);
+	CurrentWeapon->OnEquipped();
+
+	// Call HUD Init
+	if (AWWHUD* HUD = Cast<AWWHUD>(GetWorld()->GetFirstPlayerController()->GetHUD()))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("OnRep_CurrentWeapon: Initializing HUD for local client."));
+		HUD->InitWeaponOverlay(WeaponASC, Cast<UWWGunAttributeSet>(WeaponAttributes), CurrentWeapon->WeaponIcon);
+		UE_LOG(LogTemp, Warning, TEXT("Calling InitWeaponOverlay for %s, in OnRep_CurrentWeapon"), *Character->GetName());
+	}
+}
+
+void UWWCombatComponent::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(UWWCombatComponent, CurrentWeapon);
 }
 
 
@@ -52,6 +89,7 @@ void UWWCombatComponent::EquipWeapon(AWWGunBase* WeaponToEquip)
 
 	if (CurrentWeapon) return;
 	CurrentWeapon = WeaponToEquip;
+	UE_LOG(LogTemp, Warning, TEXT("Calling InitWeaponOverlay for %s, in EquipWeapon"), *Character->GetName());
 	//ADD WEAPON.EQUIPPED GAMEPLAYTAG HERE
 	const USkeletalMeshSocket* HandSocket = Character->GetMesh()->GetSocketByName(FName("WeaponHandSocket"));
 	if (HandSocket)
@@ -59,15 +97,36 @@ void UWWCombatComponent::EquipWeapon(AWWGunBase* WeaponToEquip)
 		HandSocket->AttachActor(CurrentWeapon, Character->GetMesh());
 	}
 	AWWCharacterBase* PlayerCharacter = Cast<AWWCharacterBase>(Character);
-	if (Character)
-	{
-		PlayerCharacter->SetEquippedWeapon(CurrentWeapon);
-	}
+
+	AbilitySystemComponent = CurrentWeapon->GetAbilitySystemComponent();
+	WeaponAttributeSet = CurrentWeapon->GetAttributeSet();
+	float Ammo = WeaponAttributeSet->GetAmmo();
+	UE_LOG(LogTemp, Warning, TEXT("Current Weapon Stats, Ammo: %f"), Ammo)
+	AbilitySystemComponent->InitAbilityActorInfo(CurrentWeapon, CurrentWeapon);
 	CurrentWeapon->SetOwner(Character);
+	CurrentWeapon->OnEquipped();
 	//CurrentWeapon->ShowPickupWidget(false);
-	CurrentWeapon->ApplyEffect(CurrentWeapon->GE_Equipped);
-	CurrentWeapon->OnPickup();
+	
+	//CurrentWeapon->RemoveWeaponEffect(CurrentWeapon->GE_ReadyToPickup);
+	//CurrentWeapon->ApplyWeaponEffect(CurrentWeapon->GE_Equipped);
+	
+	//CurrentWeapon->ApplyEffect(CurrentWeapon->GE_Equipped);
+	//CurrentWeapon->OnEquipped();
 	//CurrentWeapon->UnHighlightActor();
+	
+	if (Character->IsLocallyControlled())
+	{
+		if (AWWPlayerController* WWPlayerController = Cast<AWWPlayerController>(Character->GetController()))
+		{
+			if (AWWHUD* HUD = Cast<AWWHUD>(GetWorld()->GetFirstPlayerController()->GetHUD()))
+			{
+				if (AbilitySystemComponent && WeaponAttributeSet)
+				{
+					HUD->InitWeaponOverlay(AbilitySystemComponent, Cast<UWWGunAttributeSet>(WeaponAttributeSet), CurrentWeapon->WeaponIcon);
+				}
+			}
+		}
+	}
 	
 }
 

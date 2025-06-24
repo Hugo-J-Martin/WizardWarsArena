@@ -99,19 +99,6 @@ UAbilitySystemComponent* AWWCharacterBase::GetAbilitySystemComponent() const
 }
 
 
-void AWWCharacterBase::SetEquippedWeapon(AWWGunBase* NewWeapon)
-{
-	EquippedWeapon = NewWeapon;
-
-	// Inform HUD (if already initialized)
-	if (AWWPlayerController* WWPlayerController = Cast<AWWPlayerController>(GetController()))
-	{
-		if (AWWHUD* WWHUD = Cast<AWWHUD>(WWPlayerController->GetHUD()))
-		{
-			//WWHUD->OnWeaponEquipped(NewWeapon); // <-- See Step 3
-		}
-	}
-}
 
 // Called when the game starts or when spawned
 void AWWCharacterBase::BeginPlay()
@@ -133,6 +120,7 @@ void AWWCharacterBase::InitAbilityActorInfo()
 	{
 		if (AWWHUD* WWHUD = Cast <AWWHUD>(WWPlayerController->GetHUD()))
 		{
+			// Init HUD overlay widget
 			WWHUD->InitOverlay(WWPlayerController, WWPlayerState, AbilitySystemComponent, AttributeSet);
 		}
 	}
@@ -170,6 +158,7 @@ void AWWCharacterBase::OnRep_OverlappingWeapon(AWWGunBase* LastWeapon)
 
 void AWWCharacterBase::Equip()
 {
+	
 	UE_LOG(LogTemp, Warning, TEXT("Equip button pressed"));
 	if (Combat)
 	{

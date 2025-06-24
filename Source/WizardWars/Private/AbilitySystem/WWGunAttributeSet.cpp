@@ -7,6 +7,7 @@
 #include "GameplayEffectExtension.h"
 #include "GameFramework/Character.h"
 #include "Net/UnrealNetwork.h"
+#include "Weapon/WWGunBase.h"
 
 UWWGunAttributeSet::UWWGunAttributeSet()
 {
@@ -37,6 +38,74 @@ void UWWGunAttributeSet::GetLifetimeReplicatedProps(TArray<class FLifetimeProper
 	DOREPLIFETIME_CONDITION_NOTIFY(UWWGunAttributeSet, Spread, COND_None, REPNOTIFY_Always);
 }
 
+void UWWGunAttributeSet::PreAttributeBaseChange(const FGameplayAttribute& Attribute, float& NewValue) const
+{
+	Super::PreAttributeBaseChange(Attribute, NewValue);
+
+	//Clamps Ammo to MaxAmmo
+	if (Attribute == GetAmmoAttribute())
+	{
+		NewValue = FMath::Clamp(NewValue, 0.f, GetMaxAmmo());
+		
+	}
+	if (Attribute == GetReserveAmmoAttribute())
+	{
+		NewValue = FMath::Clamp(NewValue, 0.f, 999.f);
+	}
+	
+}
+
+
+
+void UWWGunAttributeSet::SetEffectProperties(const FGameplayEffectModCallbackData& Data, FWeaponEffectProperties& Props) const
+{
+	//Source = causer of the effect, Target = target of the effect (owner of this AttributeSet)
+	
+	Props.EffectContextHandle = Data.EffectSpec.GetContext();
+	
+	Props.SourceASC = Props.EffectContextHandle.GetOriginalInstigatorAbilitySystemComponent();
+
+	if (IsValid(Props.SourceASC) && Props.SourceASC->AbilityActorInfo.IsValid() && Props.SourceASC->AbilityActorInfo->AvatarActor.IsValid())
+	{
+		Props.SourceAvatarActor = Props.SourceASC->AbilityActorInfo->AvatarActor.Get();
+		Props.SourceController = Props.SourceASC->AbilityActorInfo->PlayerController.Get();
+		if (Props.SourceController == nullptr && Props.SourceAvatarActor != nullptr)
+		{
+			if (APawn* Pawn = Cast<APawn>(Props.SourceAvatarActor))
+			{
+				Props.SourceController = Pawn->GetController();
+			}
+		}
+		if (Props.SourceController)
+		{
+			Props.SourceCharacter = Cast<ACharacter>(Props.SourceController->GetPawn());
+		}
+	}
+
+	if (Data.Target.AbilityActorInfo.IsValid() && Data.Target.AbilityActorInfo.IsValid())
+	{
+		Props.TargetAvatarActor = Data.Target.AbilityActorInfo->AvatarActor.Get();
+		Props.TargetController = Data.Target.AbilityActorInfo->PlayerController.Get();
+		Props.TargetActor = Cast<AWWGunBase>(Props.TargetAvatarActor);
+		Props.TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(Props.TargetAvatarActor);
+	}
+}
+
+void UWWGunAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallbackData& Data)
+{
+	Super::PostGameplayEffectExecute(Data);
+
+	FWeaponEffectProperties Props;
+	SetEffectProperties(Data, Props);
+
+	const FGameplayAttribute& ModifiedAttribute = Data.EvaluatedData.Attribute;
+
+	if (ModifiedAttribute == GetAmmoAttribute())
+	{
+		UE_LOG(LogTemp, Log, TEXT("Ammo changed to: %f"), GetAmmo());
+	}
+}
+
 void UWWGunAttributeSet::OnRep_Damage(const FGameplayAttributeData& OldDamage) const
 {
 	GAMEPLAYATTRIBUTE_REPNOTIFY(UWWGunAttributeSet, Damage, OldDamage);
@@ -60,6 +129,7 @@ void UWWGunAttributeSet::OnRep_MaxAmmo(const FGameplayAttributeData& OldMaxAmmo)
 void UWWGunAttributeSet::OnRep_ReserveAmmo(const FGameplayAttributeData& OldReserveAmmo) const
 {
 	GAMEPLAYATTRIBUTE_REPNOTIFY(UWWGunAttributeSet, ReserveAmmo, OldReserveAmmo);
+	
 }
 
 void UWWGunAttributeSet::OnRep_FireRate(const FGameplayAttributeData& OldFireRate) const
@@ -86,3 +156,4 @@ void UWWGunAttributeSet::OnRep_Spread(const FGameplayAttributeData& OldSpread) c
 {
 	GAMEPLAYATTRIBUTE_REPNOTIFY(UWWGunAttributeSet, Spread, OldSpread);
 }
+

@@ -12,6 +12,40 @@ GAMEPLAYATTRIBUTE_PROPERTY_GETTER(ClassName, PropertyName) \
 GAMEPLAYATTRIBUTE_VALUE_GETTER(PropertyName) \
 GAMEPLAYATTRIBUTE_VALUE_SETTER(PropertyName) \
 GAMEPLAYATTRIBUTE_VALUE_INITTER(PropertyName)
+
+USTRUCT()
+struct FWeaponEffectProperties
+{
+	GENERATED_BODY()
+
+	FWeaponEffectProperties(){}
+
+	FGameplayEffectContextHandle EffectContextHandle;
+
+	UPROPERTY()
+	UAbilitySystemComponent* SourceASC = nullptr;
+
+	UPROPERTY()
+	AActor* SourceAvatarActor = nullptr;
+
+	UPROPERTY()
+	AController* SourceController = nullptr;
+
+	UPROPERTY()
+	ACharacter* SourceCharacter = nullptr;
+
+	UPROPERTY()
+	UAbilitySystemComponent* TargetASC = nullptr;
+
+	UPROPERTY()
+	AActor* TargetAvatarActor = nullptr;
+
+	UPROPERTY()
+	AController* TargetController = nullptr;
+
+	UPROPERTY()
+	AActor* TargetActor = nullptr;
+};
 /**
  * 
  */
@@ -23,6 +57,9 @@ class WIZARDWARS_API UWWGunAttributeSet : public UAttributeSet
 public:
 	UWWGunAttributeSet();
 	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
+
+	virtual void PreAttributeBaseChange(const FGameplayAttribute& Attribute, float& NewValue) const override;
+	virtual void PostGameplayEffectExecute(const FGameplayEffectModCallbackData& Data) override;
 
 	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_Damage, Category = "Stats")
 	FGameplayAttributeData Damage;
@@ -87,6 +124,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Attributes")
 	float GetDamageValue() const { return Damage.GetCurrentValue(); }
+
+private:
+	void SetEffectProperties(const FGameplayEffectModCallbackData& Data, FWeaponEffectProperties& Props) const;
 	
 	
 };

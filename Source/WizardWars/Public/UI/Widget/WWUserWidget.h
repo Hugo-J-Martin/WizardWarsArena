@@ -17,12 +17,23 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void SetWidgetController(UObject* InWidgetController);
+
+	UFUNCTION(BlueprintCallable)
+	void SetWeaponWidgetController(UObject* Controller);
 	
 	UPROPERTY(BlueprintReadOnly)
 	TObjectPtr<UObject> WidgetController;
 
+	UPROPERTY(BlueprintReadOnly)
+	TObjectPtr<UObject> WeaponWidgetController;
+
 protected:
 	UFUNCTION(BlueprintImplementableEvent)
 	void WidgetControllerSet();
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void WeaponWidgetControllerSet();
+	
+	
 	
 };

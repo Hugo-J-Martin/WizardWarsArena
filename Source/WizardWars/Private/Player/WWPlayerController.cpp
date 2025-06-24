@@ -2,6 +2,8 @@
 
 
 #include "Player/WWPlayerController.h"
+
+#include "AbilitySystemBlueprintLibrary.h"
 #include "EnhancedInputSubsystems.h"
 #include "EnhancedInputComponent.h"
 #include "Blueprint/UserWidget.h"
@@ -96,6 +98,7 @@ void AWWPlayerController::CrosshairTrace()
 	bool bHit = GetWorld()->LineTraceSingleByChannel(CrosshairHit, TraceStart, TraceEnd, ECollisionChannel::ECC_GameTraceChannel1);
 	if (bHit)
 	{
+		
 		//DrawDebugSphere(GetWorld(), CrosshairHit.Location, 10.0f, 12, FColor::Yellow, false, 1.0f);
 		if (AActor* HitActor = CrosshairHit.GetActor()) //Checks to see if it's an actor 
 		{
@@ -104,6 +107,7 @@ void AWWPlayerController::CrosshairTrace()
 				FString PickupName = IInteractableInterface::Execute_GetPickupName(HitActor);; //If it does, get the pickup's name
 			}
 		}
+		
 	}
 
 	//Setting up actor variables for applying outline 
