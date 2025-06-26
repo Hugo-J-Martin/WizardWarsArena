@@ -7,6 +7,7 @@
 #include "GameplayEffectExtension.h"
 #include "GameFramework/Character.h"
 #include "Net/UnrealNetwork.h"
+#include "UI/WidgetController/HUDWeaponWidgetController.h"
 #include "Weapon/WWGunBase.h"
 
 UWWGunAttributeSet::UWWGunAttributeSet()
@@ -55,8 +56,6 @@ void UWWGunAttributeSet::PreAttributeBaseChange(const FGameplayAttribute& Attrib
 	
 }
 
-
-
 void UWWGunAttributeSet::SetEffectProperties(const FGameplayEffectModCallbackData& Data, FWeaponEffectProperties& Props) const
 {
 	//Source = causer of the effect, Target = target of the effect (owner of this AttributeSet)
@@ -100,9 +99,9 @@ void UWWGunAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallb
 
 	const FGameplayAttribute& ModifiedAttribute = Data.EvaluatedData.Attribute;
 
-	if (ModifiedAttribute == GetAmmoAttribute())
+	if (ModifiedAttribute == GetReserveAmmoAttribute())
 	{
-		UE_LOG(LogTemp, Log, TEXT("Ammo changed to: %f"), GetAmmo());
+		UE_LOG(LogTemp, Log, TEXT("ReserveAmmo changed to: %f"), GetReserveAmmo());
 	}
 }
 
@@ -129,7 +128,6 @@ void UWWGunAttributeSet::OnRep_MaxAmmo(const FGameplayAttributeData& OldMaxAmmo)
 void UWWGunAttributeSet::OnRep_ReserveAmmo(const FGameplayAttributeData& OldReserveAmmo) const
 {
 	GAMEPLAYATTRIBUTE_REPNOTIFY(UWWGunAttributeSet, ReserveAmmo, OldReserveAmmo);
-	
 }
 
 void UWWGunAttributeSet::OnRep_FireRate(const FGameplayAttributeData& OldFireRate) const

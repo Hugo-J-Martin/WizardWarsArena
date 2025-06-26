@@ -18,11 +18,13 @@ AWWGunBase::AWWGunBase()
 
 	PrimaryActorTick.bCanEverTick = true;
 	bReplicates = true;
+	SetReplicates(true);
 	//SetReplicatingMovement(true);
 	AbilitySystemComponent = CreateDefaultSubobject<UAbilitySystemComponent>(TEXT("AbilitySystemComponent"));
 	AbilitySystemComponent->SetIsReplicated(true);
-	SetReplicates(true);
 	AbilitySystemComponent->SetReplicationMode(EGameplayEffectReplicationMode::Mixed);
+	AttributeSet = CreateDefaultSubobject<UWWGunAttributeSet>(TEXT("AttributeSet"));
+	NetUpdateFrequency = 100.f;
 	
 	GunMesh = CreateDefaultSubobject<USkeletalMeshComponent>("GunMesh");
 	GunMesh->SetupAttachment(RootComponent);
@@ -53,19 +55,8 @@ AWWGunBase::AWWGunBase()
 	//Pickup Radius Default values
 	HighlightRadius->SetSphereRadius(100.f);
 	HighlightRadius->SetVisibility(true);
-	//HighlightRadius->SetHiddenInGame(false);
-
-	AbilitySystem = CreateDefaultSubobject<UAbilitySystemComponent>(TEXT("AbilitySystem"));
-	AttributeSet = CreateDefaultSubobject<UWWGunAttributeSet>(TEXT("AttributeSet"));
-
+	
 	FActiveGameplayEffectHandle EquippedEffectHandle;
-
-
-	
-
-	
-	//EquippedEffectHandle = AbilitySystemComponent->ApplyGameplayEffectToSelf(GE_ReadyToPickup->GetDefaultObject<UGameplayEffect>(), 1.f, AbilitySystemComponent->MakeEffectContext());
-	
 	
 }
 
@@ -86,13 +77,13 @@ void AWWGunBase::BeginPlay()
 	{
 		PickupWidget->SetVisibility(false);
 	}
-	if (HasAuthority() && AbilitySystem && AttributeSet)
+	if (HasAuthority() && AbilitySystemComponent && AttributeSet)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Has AttributeSet"));
 	}
 	if (AbilitySystemComponent)
 	{
-		AbilitySystemComponent->InitAbilityActorInfo(this, this);
+		
 		ApplyWeaponEffect(GE_ReadyToPickup);
 	}
 }
@@ -287,12 +278,6 @@ FString AWWGunBase::GetPickupName_Implementation() const
 {
 	return WeaponName;
 }
-/**
-UAbilitySystemComponent* AWWGunBase::GetAbilitySystemComponent() const
-{
-	return AbilitySystemComponent;
-}
-**/
 void AWWGunBase::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);

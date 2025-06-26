@@ -54,13 +54,8 @@ public:
 
 	virtual void BroadcastInitialValues();
 
-	//virtual void BroadcastWeaponValues();
-
 	virtual void BindCallbacksToDependencies();
 
-	//virtual void BindWeaponCallbacksToDependecies();
-
-	//virtual void SetWeaponAttributes(UAttributeSet* InWeaponAttributes);
 protected:
 
 	UPROPERTY(BlueprintReadOnly, Category = "WidgetController")
@@ -74,12 +69,5 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly, Category = "WidgetController")
 	TObjectPtr<UAttributeSet> AttributeSet;
-
-	/**
-	UPROPERTY(BlueprintReadOnly, Category = "WidgetController")
-	TObjectPtr<UAbilitySystemComponent> WeaponAbilitySystemComponent;
-
-	UPROPERTY(BlueprintReadOnly, Category = "WidgetController")
-	TObjectPtr<UAttributeSet> WeaponAttributeSet;
-	**/
+	
 };

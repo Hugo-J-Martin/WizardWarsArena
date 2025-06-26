@@ -42,9 +42,7 @@ public:
 	virtual void UnHighlightActor(AWWPlayerController* PC) override;
 
 	virtual FString GetPickupName_Implementation() const override;
-
-	//virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
-	//UAttributeSet* GetAttributeSet() const { return AttributeSet; }
+	
 	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
 
 	UFUNCTION(BlueprintCallable)
@@ -59,19 +57,9 @@ public:
 	UPROPERTY()
 	UWWGunAttributeSet* AttributeSet;
 
-	//UPROPERTY(BlueprintReadOnly, Category = "Ammo", meta = (AllowPrivateAccess = true))
-	//FGameplayAttributeData Ammo;
-
-	//UPROPERTY(BlueprintReadOnly, Category = "Ammo", meta = (AllowPrivateAccess = true))
-	//FGameplayAttributeData ReserveAmmo;
-	
-
 	virtual void InitializeEffect();
 	virtual void ApplyEffect(TSubclassOf<UGameplayEffect> GameplayEffect);
 	virtual void RemoveEffect(TSubclassOf<UGameplayEffect> GameplayEffect);
-
-	//void SetWeaponStateTag(FGameplayTag NewStateTag);
-	//FGameplayTag GetCurrentWeaponStateTag() const;
 
 	void ApplyWeaponEffect(TSubclassOf<UGameplayEffect> Effect);
 	void RemoveWeaponEffect(TSubclassOf<UGameplayEffect> Effect);
@@ -127,17 +115,6 @@ protected:
 		int32 OtherBodyIndex
 	);
 
-	//void ClearWeaponStateTags();
-	/**
-	UPROPERTY()
-	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;
-
-	UPROPERTY()
-	TObjectPtr<UAttributeSet> AttributeSet;
-	**/
-	
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "GAS")
-	TObjectPtr<UAbilitySystemComponent> AbilitySystem;
 	
 	UPROPERTY(EditAnywhere, Category = "Weapon Properties")
 	TObjectPtr<USkeletalMeshComponent> GunMesh;
@@ -153,12 +130,6 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "Weapon Properties|Pickup")
 	TObjectPtr<UWidgetComponent> PickupWidget;
-
-	
-
-	//FGameplayTag InitialTag;
-	//FGameplayTag EquippedTag;
-	//FGameplayTag DroppedTag;
 
 
 private:	

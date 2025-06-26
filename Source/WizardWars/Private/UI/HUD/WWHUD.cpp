@@ -52,7 +52,7 @@ void AWWHUD::InitOverlay(APlayerController* PC, APlayerState* PS, UAbilitySystem
 	//HUDWidget->AddToViewport();
 }
 
-void AWWHUD::InitWeaponOverlay(UAbilitySystemComponent* WeaponASC, UWWGunAttributeSet* WeaponAS, UTexture2D* WeaponIcon)
+void AWWHUD::InitWeaponOverlay(UAbilitySystemComponent* WeaponASC, UWWGunAttributeSet* WeaponAS, UTexture2D* WeaponIcon, FString WeaponName)
 {
 
 	if (!IsValid(HUDWidgetClass) || !IsValid(HUDWidgetControllerClass))
@@ -86,6 +86,7 @@ void AWWHUD::InitWeaponOverlay(UAbilitySystemComponent* WeaponASC, UWWGunAttribu
 
 	WeaponWidgetController->SetWidgetControllerParams(WeaponWidgetControllerParams);
 	WeaponWidgetController->WeaponIcon = WeaponIcon;
+	WeaponWidgetController->WeaponName = WeaponName;
 
 	WeaponWidgetController->BindCallbacksToDependencies(); //Where the delegates are bound
 

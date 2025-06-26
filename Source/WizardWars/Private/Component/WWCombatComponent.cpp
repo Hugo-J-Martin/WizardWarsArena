@@ -53,7 +53,7 @@ void UWWCombatComponent::OnRep_CurrentWeapon()
 	if (AWWHUD* HUD = Cast<AWWHUD>(GetWorld()->GetFirstPlayerController()->GetHUD()))
 	{
 		UE_LOG(LogTemp, Warning, TEXT("OnRep_CurrentWeapon: Initializing HUD for local client."));
-		HUD->InitWeaponOverlay(WeaponASC, Cast<UWWGunAttributeSet>(WeaponAttributes), CurrentWeapon->WeaponIcon);
+		HUD->InitWeaponOverlay(WeaponASC, Cast<UWWGunAttributeSet>(WeaponAttributes), CurrentWeapon->WeaponIcon, CurrentWeapon->WeaponName);
 		UE_LOG(LogTemp, Warning, TEXT("Calling InitWeaponOverlay for %s, in OnRep_CurrentWeapon"), *Character->GetName());
 	}
 }
@@ -80,7 +80,6 @@ void UWWCombatComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAc
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	// ...
 }
 
 void UWWCombatComponent::EquipWeapon(AWWGunBase* WeaponToEquip)
@@ -105,24 +104,17 @@ void UWWCombatComponent::EquipWeapon(AWWGunBase* WeaponToEquip)
 	AbilitySystemComponent->InitAbilityActorInfo(CurrentWeapon, CurrentWeapon);
 	CurrentWeapon->SetOwner(Character);
 	CurrentWeapon->OnEquipped();
-	//CurrentWeapon->ShowPickupWidget(false);
-	
-	//CurrentWeapon->RemoveWeaponEffect(CurrentWeapon->GE_ReadyToPickup);
-	//CurrentWeapon->ApplyWeaponEffect(CurrentWeapon->GE_Equipped);
-	
-	//CurrentWeapon->ApplyEffect(CurrentWeapon->GE_Equipped);
-	//CurrentWeapon->OnEquipped();
-	//CurrentWeapon->UnHighlightActor();
 	
 	if (Character->IsLocallyControlled())
 	{
+		// Server's local player or owning client: safe to init HUD here
 		if (AWWPlayerController* WWPlayerController = Cast<AWWPlayerController>(Character->GetController()))
 		{
-			if (AWWHUD* HUD = Cast<AWWHUD>(GetWorld()->GetFirstPlayerController()->GetHUD()))
+			if (AWWHUD* HUD = Cast<AWWHUD>(WWPlayerController->GetHUD()))
 			{
 				if (AbilitySystemComponent && WeaponAttributeSet)
 				{
-					HUD->InitWeaponOverlay(AbilitySystemComponent, Cast<UWWGunAttributeSet>(WeaponAttributeSet), CurrentWeapon->WeaponIcon);
+					HUD->InitWeaponOverlay(AbilitySystemComponent, Cast<UWWGunAttributeSet>(WeaponAttributeSet), CurrentWeapon->WeaponIcon, CurrentWeapon->WeaponName);
 				}
 			}
 		}

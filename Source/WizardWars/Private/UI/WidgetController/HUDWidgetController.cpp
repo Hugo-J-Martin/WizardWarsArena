@@ -40,10 +40,6 @@ void UHUDWidgetController::BindCallbacksToDependencies()
 
 	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(
 		WWAttributeSet->GetMaxArmorAttribute()).AddUObject(this, &UHUDWidgetController::MaxArmorChanged);
-
-
-
-
 	
 }
 

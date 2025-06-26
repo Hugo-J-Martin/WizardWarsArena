@@ -9,7 +9,6 @@ void UWWWidgetController::SetWidgetControllerParams(const FWidgetControllerParam
 	PlayerState = WCParams.PlayerState;
 	AbilitySystemComponent = WCParams.AbilitySystemComponent;
 	AttributeSet = WCParams.AttributeSet;
-	//WeaponAttributeSet = WCParams.WeaponAttributeSet;
 }
 
 void UWWWidgetController::BroadcastInitialValues()

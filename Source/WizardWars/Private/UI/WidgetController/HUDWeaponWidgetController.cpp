@@ -13,6 +13,8 @@ void UHUDWeaponWidgetController::BroadcastInitialValues()
 
 void UHUDWeaponWidgetController::BindCallbacksToDependencies()
 {
+	UE_LOG(LogTemp, Warning, TEXT("BindCallbacksToDependencies called on %s"), *GetName());
+	
 	const UWWGunAttributeSet* GunAttributes = CastChecked<UWWGunAttributeSet>(AttributeSet);
 	
 	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(

@@ -35,6 +35,9 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category="Weapon")
 	UTexture2D* WeaponIcon;
 
+	UPROPERTY(BlueprintReadOnly, Category="Weapon")
+	FString WeaponName;
+
 protected:
 
 	void AmmoChanged(const FOnAttributeChangeData& Data) const;

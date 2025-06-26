@@ -32,7 +32,7 @@ public:
 
 	void InitOverlay(APlayerController* PC, APlayerState* PS, UAbilitySystemComponent* ASC, UAttributeSet* AS);
 
-	void InitWeaponOverlay(UAbilitySystemComponent* WeaponASC, UWWGunAttributeSet* WeaponAS, UTexture2D* WeaponIcon);
+	void InitWeaponOverlay(UAbilitySystemComponent* WeaponASC, UWWGunAttributeSet* WeaponAS, UTexture2D* WeaponIcon, FString WeaponName);
 
 
 
